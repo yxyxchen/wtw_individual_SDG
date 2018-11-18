@@ -2,14 +2,12 @@
 # plot theme 
 saveTheme = theme(panel.background = element_rect(fill = "white",colour = "white"),
                 panel.grid.minor = element_blank(),
-                panel.grid.major = element_blank()) +
-  theme(axis.line.x = element_line(color="black", size = 2),
-        axis.line.y = element_line(color="black", size = 2))+ 
-  theme(axis.title=element_text(size=25), title =element_text(size=30, face='bold'), 
+                panel.grid.major = element_blank()) + 
+  theme(title =element_text(size = 8, face='bold'), 
         plot.title = element_text(hjust = 0.5)) + 
-  theme(axis.text = element_text(size=25), axis.line= element_line(color="black", size = 2)) +
-  theme(strip.text = element_text(face="bold", size=20)) + 
-  theme(legend.text=element_text(size= 25))
+  theme(axis.title=element_text(size= 8), axis.text = element_text(size=8), axis.line= element_line(color="black", size = 0.5)) +
+  theme(strip.text = element_text(face="bold", size=8)) + 
+  theme(legend.text=element_text(size= 8))
 
 # plot theme 
 displayTheme = theme(panel.background = element_rect(fill = "white",colour = "white"),

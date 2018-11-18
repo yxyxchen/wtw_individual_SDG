@@ -1,34 +1,19 @@
 #source('plotTheme.R')
 
 ######## condition varibles #########
-conditions = c("unif16", "log_1.75_32")
+conditions = c("unif20", "pareto5")
 conditionNames = c("HP", "LP")
 conditionColors = c("#7b3294", "#008837")
 
 ######## timing variables ########
-tMaxs = c(16, 32) # trial durations
-blockMins = 15 # block duration in mins
+tMaxs = c(20, 40) # trial durations
+blockMins = 7 # block duration in mins
 blockSecs = blockMins * 60 # block duration in secs
 iti = 2 # iti duration in secs
 tGrid = seq(0, blockSecs, 0.1)
 
 ######### reward variable ########
-tokenValue = 5 #value of the token
-## reward timings in HP
-HPTimings = seq(2, 16, by = 2) 
-## reward timings in LP
-n = 8
-m = 32
-fac = 1.75
-d1 = log(m/(fac^n - 1))
-d2 = log(m + m/(fac^n - 1))
-tempt = exp(seq(d1,d2,length.out = n+1))
-LPTimings = tempt[2:length(tempt)] - tempt[1]
-timings = list(
-  HP = HPTimings,
-  LP = LPTimings
-)
-rm(m, fac, d1, d2, tempt, HPTimings, LPTimings)
+tokenValue = 10 #value of the token
 
 ########## supporting vairbales ########
 # time ticks within a trial for timeEarnings or wtw analysis
@@ -39,18 +24,37 @@ trialTicks = list(
 
 ########## additional  variables for optimal analysis ########
 # CDF of reward delays: p(t_reward <= T)
+k = 4
+mu = 0
+sigma = 2
+pareto = list()
+pareto[['k']] = k
+pareto[['mu']] = mu
+pareto[['sigma']] = sigma
+HP = 1 / trialTicks$HP[length(trialTicks$HP)]  * trialTicks$HP
+LP = 1 - (1 + k * (trialTicks$LP - mu) / sigma) ^ (-1 / k)
+LP[length(trialTicks$LP)] = 1 
 rewardDelayCDF = list(
- HP = approx(c(0, timings$HP), seq(0, 1, 1/n), xout = trialTicks$HP, method = "constant")$y, 
- LP = approx(c(0, round(timings$LP,1)), seq(0, 1, 1/n), xout = trialTicks$LP, method = "constant")$y
+  HP = HP,
+  LP = LP
 )
 
+# library(ggplot2)
+# source('plotThemes.R')
+# plotData = data.frame(time = c(trialTicks$HP, trialTicks$LP),
+#                       cdf = c(rewardDelayCDF$HP, rewardDelayCDF$LP),
+#                       condition = c(rep('HP', length(trialTicks$HP)),
+#                                     rep('LP', length(trialTicks$LP))))
+# ggplot(plotData, aes(time, cdf, linetype = condition)) + geom_line() + xlab('Elapsed time / s') +
+#   ylab('CDF') + ggtitle('Timing conditions') + saveTheme
+# 
+# ggsave('../outputs/exp_figures/timing_conditions.png', width = 3, height = 2)
+
+
 #  PDF of reward delays: p(t_reward = T)
-HP = rep(0, length(trialTicks$HP))
-HP[trialTicks$HP %in% timings$HP] = 1 / n 
-LP = rep(0, length(trialTicks$LP))
-# can't find ticks exactly equal to the timings 
-# find cloest one 
-LP[trialTicks$LP %in% round(timings$LP, 1)] = 1 / n 
+#  make it discrete 
+HP = c(0, diff(rewardDelayCDF$HP))
+LP = c(0, diff(rewardDelayCDF$LP))
 rewardDelayPDF = list(
   "HP" = HP,
   "LP" = LP
@@ -58,7 +62,9 @@ rewardDelayPDF = list(
 
 # E(t_reward | t_reward <= T) 
 HP = cumsum(trialTicks$HP * rewardDelayPDF$HP) / cumsum(rewardDelayPDF$HP)
+HP[1] = NaN
 LP = cumsum(trialTicks$LP * rewardDelayPDF$LP) / cumsum(rewardDelayPDF$LP)
+LP[1] = NaN
 # no reward arrives before the first reward timing, so points before that turn to NAN
 meanRewardDelay = list('HP' = HP, 'LP' = LP)
 
@@ -80,20 +86,14 @@ optimRewardRates = list()
 optimRewardRates$HP = max(HP)
 optimRewardRates$LP = max(LP)
   
-# # plot rewardRate
-# for(c in 1:2){
-#   thisCond = conditionNames[c];
-#   plotData = data.frame(rewardRate = rewardRate[[thisCond]],
-#                         waitThreshold = trialTicks[[thisCond]] )
-#   opRewardRate = max(plotData$rewardRate);
-#   opWaitThreshold = plotData$waitThreshold[which.max(plotData$rewardRate)]
-#   opRewardRate * blockSecs
-#   ggplot(plotData, aes(waitThreshold, rewardRate)) + geom_point(size = 1) +
-#     geom_vline(xintercept = opWaitThreshold, size = 1, color = 'red', linetype  = 2) + 
-#     xlab('Wait threshold / s') + ylab('Reward rate') + saveTheme  + ggtitle(thisCond)
-#   fileName = sprintf("figures/rewardRate%s.pdf", thisCond)
-#   ggsave(fileName, width = 6, height = 4)
-# }
 
-
+# library(ggplot2)
+# source('plotThemes.R')
+# plotData = data.frame(time = c(trialTicks$HP, trialTicks$LP),
+#                       rewardRate = c(rewardRate$HP, rewardRate$LP),
+#                       condition = c(rep('HP', length(trialTicks$HP)), 
+#                                     rep('LP', length(trialTicks$LP))))
+# ggplot(plotData, aes(time, rewardRate, linetype = condition)) + geom_line() + xlab('Giving-up time /s') +
+#   ylab('Total Earnings / cent') + ggtitle('Expected payoff functions') + saveTheme
+# ggsave('../outputs/exp_figures/expected_payoff.png', width = 3, height = 2)
 
