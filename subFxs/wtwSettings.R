@@ -1,7 +1,7 @@
 #source('plotTheme.R')
 
 ######## condition varibles #########
-conditions = c("unif20", "pareto5")
+conditions = c("unif20", "pareto4_2")
 conditionNames = c("HP", "LP")
 conditionColors = c("#7b3294", "#008837")
 

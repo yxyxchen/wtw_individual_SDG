@@ -59,7 +59,7 @@ for(condIdx in 1 : 2){
   for(i in 1 : 1:nrow(initialSpace)){
     para = initialSpace[i,]
     for(j in 1 : nRep ){
-      tempt=  QStarModel(para,otherPara, cond)
+      tempt=  simulationModel(para,otherPara, cond)
       TrialEarnings[i, j,] = tempt[['trialEarnings']]
       Ws[i, j,] = tempt[['ws']]
       RewardDelays[i, j,] = tempt[['rewardDelays']]
