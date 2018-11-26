@@ -1,3 +1,4 @@
+library('ggplot2')
 source('model.R')
 source('subFxs/loadFxs.R')
 source("subFxs/plotThemes.R")

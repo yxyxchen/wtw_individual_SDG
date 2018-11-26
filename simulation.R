@@ -24,8 +24,6 @@ for(condIdx in 1 : 2){
   
   # other input
   stepDuration = 0.5
-  traceDecay = 0.985
-  sigma = 0.2
   
   # genrate
   otherPara = getOtherPara(cond, stepDuration)

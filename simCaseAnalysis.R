@@ -12,7 +12,7 @@ load('outputs/QStarData/RawHPData.RData')
 load('outputs/QStarData/RawLPData.RData')
 
 ###### choose condition ########3
-condIdx = 2
+condIdx = 1
 cond = conditions[condIdx]
 condName = conditionNames[condIdx]
 
@@ -25,6 +25,7 @@ trialTick = trialTicks[[condIdx]] # so here if use [2] then get a list
 ####### view simulation data case by case ##########
 # choose cases you want to plot
 nCombList = which(inputColp$AUC <= 6 & inputColp$AUC >= 2 ) 
+nCombList = 1;
 # choose figrues you want to plot
 plotTrialData = F
 plotKMSC= T
