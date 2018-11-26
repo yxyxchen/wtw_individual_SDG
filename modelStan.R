@@ -30,7 +30,7 @@ nTimeStep = tMax / stepDuration
 cbIdx = 1;
 
 # learning para 
-para = initialSpace[1,]
+para = initialSpace[200,]
 phi = para[1]
 tau =  para[2]
 gamma =  para[3]
@@ -44,6 +44,7 @@ rewardDelays = inputRaw$rewardDelays[cbIdx, 1, ]
 
 # nTrial
 nTrial = match(0, rewardDelays) - 1
+nTrial = 20
 # binary trialEarnings
 rewards = ifelse(trialEarnings[1 : nTrial] == tokenValue, 1, 0)
 # generate the action matrix
@@ -73,7 +74,8 @@ data_list <- list(N = nTrial,
                   tau = tau,
                   gamma = gamma,
                   lambda = lambda,
-                  wIni = wIni)
+                  wIni = wIni,
+                  tokenValue = 10)
 
 #############
 # model str
@@ -84,6 +86,7 @@ real stepDuration;
 int nTimeStep;
 int rewards[N];
 vector[N] waitDurations;
+int tokenValue;
 // int<lower = 1, upper = 2> actions[nTimeStep, N];
 
 // fixed learning paras
@@ -99,38 +102,44 @@ transformed parameters{
 // initialize 
 vector[nTimeStep] ws = rep_vector(wIni, nTimeStep); 
 vector[nTimeStep] es = rep_vector(0, nTimeStep); 
-matrix[nTimeStep, N] vaWaits;
-matrix[nTimeStep, N] vaQuits;
+matrix[nTimeStep, N] vaWaits = rep_matrix(0, nTimeStep, N);
+matrix[nTimeStep, N] vaQuits = rep_matrix(0, nTimeStep, N);
 
 // loop over trials
 for(n in 1 : N){
   // 
-  real endStep = floor(waitDurations[n] / stepDuration + rewards[n]);
+  real endStep = floor(waitDurations[n] / stepDuration) + rewards[n];
 
   // 
   vector[nTimeStep] junk;
   real vaQuit;
   real vaWait;
   real delta;
+  real reward;
   // loop over the waiting period
   int t = 1;
   while(t <= endStep){
-  // record vaWaits and vaQuits
-  vaWaits[t, n] = ws[t] * tau;
-  vaQuits[t, n] = ws[1] * gamma ^ 4 * tau;
-  // update 
-  junk = rep_vector(0, nTimeStep); 
-  junk[t] = 1;
-  es = es * gamma * lambda + junk;
-  // no reward occurs and always waits
-  vaQuit = ws[1] * gamma ^ 4;
-  vaWait= ws[t+1];
-  // no update if quits (given endStep difination, for simulation data, no reward = quit)
-    if( t < endStep || rewards[n]){
-      delta = rewards[n] + fmax(vaWait, vaQuit) - ws[t];
+    // record vaWaits and vaQuits
+    vaWaits[t, n] = ws[t] * tau;
+    if(n == 1 && t == 13) print(ws[t])
+    vaQuits[t, n] = ws[1] * gamma ^ 4 * tau;
+    // update 
+    junk = rep_vector(0, nTimeStep); 
+    junk[t] = 1;
+    es = es * gamma * lambda + junk;
+    // no reward occurs and always waits
+    vaQuit = ws[1] * gamma ^ 4;
+    vaWait= ws[t+1];
+    // no update if quits (given endStep difination, for simulation data, no reward = quit)
+    if( t < endStep ){
+      delta = 0 + fmax(vaWait, vaQuit) - ws[t];
       ws = ws + phi * delta * es;
       t = t + 1;
-    }
+    }else if(t == endStep && rewards[n] == 1 ){
+      delta = tokenValue + fmax(vaWait, vaQuit) - ws[t];
+      ws = ws + phi * delta * es;
+      t = t + 1;
+    }else{}
   }
 }
 
@@ -139,22 +148,22 @@ model {
 phi ~ normal(0.01, 1); 
 // The likelihood
 for(n in 1 : N){
-real endStep = floor(waitDurations[n] / stepDuration + rewards[n]);
-int t = 1;
-vector[2] values;
-int action;
-while(t <= endStep){
-if(t == endStep && rewards[n] == 0){
-  action = 1;
-}else{
-  action = 2;
-}
-values[1] = vaQuits[t, n];
-values[2] = vaWaits[t, n];
-action ~ categorical_logit(values);
-t = t + 1;
-}
-}
+  real endStep = floor(waitDurations[n] / stepDuration) + rewards[n];
+  int t = 1;
+  vector[2] values;
+  int action;
+  while(t <= endStep){
+  if(t == endStep && rewards[n] == 0){
+    action = 1;
+  }else{
+    action = 2;
+  }
+  values[1] = vaQuits[t, n];
+  values[2] = vaWaits[t, n];
+  action ~ categorical_logit(values);
+  t = t + 1;
+  }
+  }
 }
 generated quantities {
 // For model comparison, we'll want to keep the likelihood contribution of each point
@@ -162,7 +171,7 @@ vector[N] log_lik;
 int actions[nTimeStep, N] ;
 int action;
 for(n in 1 : N){
-  real endStep = floor(waitDurations[n] / stepDuration + rewards[n]);
+  real endStep = floor(waitDurations[n] / stepDuration) + rewards[n];
   int t = 1;
   vector[2] values;
   while(t <= endStep){
@@ -183,3 +192,6 @@ for(n in 1 : N){
 fit <- stan(model_code = cscModel, data = data_list, cores = 1, chains = 1, iter = 500)
 fileName = 'outputs/Stan/cscFit.RData'
 save(fit, file = fileName)
+
+list_of_draws = extract(fit)
+hist(list_of_draws$phi)
