@@ -23,6 +23,7 @@ dir.create(outFile)
 
 ####### plot distribution of totalEarnings
 plotData = data.frame(totalEarnings = c(colpHPData$totalEarnings, colpLPData$totalEarnings),
+                      AUC = c(colpHPData$AUC, colpLPData$AUC),
                       condition = rep(c("HP", "LP"), each = nComb), phi = initialSpace[,1],
                       tau = initialSpace[,2], gamma = initialSpace[,3],
                       lambda = initialSpace[,4], wIni = initialSpace[,5]
@@ -40,37 +41,57 @@ summarise(group_by(plotData, condition),
 
 ############ summarise para effects on total earnings ###########
 paraValues = seq(0.2, 0.8, 0.3) 
-summaryData = data.frame(condition = rep(c("HP", "LP"), each = nValue, nPara),
+paraData = data.frame(condition = rep(c("HP", "LP"), each = nValue, nPara),
                          paraNames = rep(paraNames, each = nValue * 2),
                          paraValues = rep(paraValues, nPara * 2))
-summaryData$paraNames = factor(summaryData$paraNames, levels = paraNames)
+paraData$paraNames = factor(summaryData$paraNames, levels = paraNames)
 
-# summarise mu and sd
-mu = rep(NA, nrow(summaryData))
-std = rep(NA, nrow(summaryData))
-tempt = summarise(group_by(plotData, condition, phi), mu = mean(totalEarnings), std = sd(totalEarnings))
-mu[1:6] = tempt$mu; std[1:6] = tempt$std
-tempt = summarise(group_by(plotData, condition, tau), mu = mean(totalEarnings), std = sd(totalEarnings))
-mu[7:12] = tempt$mu; std[7:12] = tempt$std
-tempt = summarise(group_by(plotData, condition, gamma), mu = mean(totalEarnings), std = sd(totalEarnings))
-mu[13:18] = tempt$mu; std[13:18] = tempt$std
-tempt = summarise(group_by(plotData, condition, lambda), mu = mean(totalEarnings), std = sd(totalEarnings))
-mu[19:24] = tempt$mu; std[19:24] = tempt$std
-tempt = summarise(group_by(plotData, condition, wIni), mu = mean(totalEarnings), std = sd(totalEarnings))
-mu[25:30] = tempt$mu; std[25:30] = tempt$std
-summaryData$mu = mu
-summaryData$std = std
-summaryData$ymin = mu - std
-summaryData$ymax = mu + std
+
+# summarise mu 
+muByPhi = summarise_at(group_by(plotData, condition, phi), vars(AUC:totalEarnings), mean)
+muByTau = summarise_at(group_by(plotData, condition, tau), vars(AUC:totalEarnings), mean)
+muByGamma = summarise_at(group_by(plotData, condition, gamma), vars(AUC:totalEarnings), mean)
+muByLambda = summarise_at(group_by(plotData, condition, lambda), vars(AUC:totalEarnings), mean)
+muByWini= summarise_at(group_by(plotData, condition, wIni), vars(AUC:totalEarnings), mean)
+# summarise sd
+stdByPhi = summarise_at(group_by(plotData, condition, phi), vars(AUC:totalEarnings), sd)
+stdByTau = summarise_at(group_by(plotData, condition, tau), vars(AUC:totalEarnings), sd)
+stdByGamma = summarise_at(group_by(plotData, condition, gamma), vars(AUC:totalEarnings), sd)
+stdByLambda = summarise_at(group_by(plotData, condition, lambda), vars(AUC:totalEarnings), sd)
+stdByWini= summarise_at(group_by(plotData, condition, wIni), vars(AUC:totalEarnings), sd)
+
+# 
+mu = rbind(muByPhi, muByTau, muByGamma, muByLambda, muByWini);
+mu = mu[, 3:4]
+std = rbind(stdByPhi, stdByTau, stdByGamma, stdByLambda, stdByWini)
+std = std[,3:4]
+max= mu + std
+min = mu -std
+
+summaryEarnData = cbind(paraData, mu[,2], std[,2], max[,2], min[,2]);
+summaryAUCData = cbind(paraData, mu[,1], std[,1], max[,1], min[,1]);
+colnames(summaryEarnData) = c(colnames(paraData), 'mu', 'std', 'max', 'min')
+colnames(summaryAUCData) = c(colnames(paraData), 'mu', 'std', 'max', 'min')
 
 # plot 
 for(c in 1:2){
   cond = conditionNames[c]
-  ggplot(summaryData[summaryData$condition == cond,], aes(factor(paraValues), mu)) +
-    geom_bar(stat = "identity", width=0.5, fill = conditionColors[c]) + geom_errorbar(aes(ymin = ymin, ymax = ymax), width=.2)+
+  ggplot(summaryAUCData[summaryAUCData$condition == cond,], aes(factor(paraValues), mu)) +
+    geom_bar(stat = "identity", width=0.5, fill = conditionColors[c]) + geom_errorbar(aes(ymin = min, ymax = max), width=.2)+
+    facet_wrap(~paraNames, nrow = 1)+ saveTheme +
+    xlab("Parameter value") + ylab("AUC / s") + ggtitle(cond) 
+  fileName = file.path(outFile, sprintf("paraAUCEffect%s.pdf", cond))
+  ggsave(fileName, width = 16, height = 8) 
+}
+
+# plot 
+for(c in 1:2){
+  cond = conditionNames[c]
+  ggplot(summaryEarnData[summaryEarnData$condition == cond,], aes(factor(paraValues), mu)) +
+    geom_bar(stat = "identity", width=0.5, fill = conditionColors[c]) + geom_errorbar(aes(ymin = min, ymax = max), width=.2)+
     facet_wrap(~paraNames, nrow = 1)+ saveTheme +
     xlab("Parameter value") + ylab("Total Earnings") + ggtitle(cond) 
-  fileName = file.path(outFile, sprintf("paraEffect%s.pdf", cond))
+  fileName = file.path(outFile, sprintf("paraEarnEffect%s.pdf", cond))
   ggsave(fileName, width = 16, height = 8) 
 }
 
@@ -125,7 +146,8 @@ ggsave(fileName, width = 8, height = 8)
 linearData = as.data.frame(initialSpace);
 colnames(linearData) = c('phi', 'tau', 'gamma', 'lambda', 'wIni')
 linearData$AUC = colpHPData$AUC
-linearData = lapply(linearData[, colnames(linearData)], scale)
+summarise(group_by(linearData, phi), mu = mean(wIni))
 fit = lm(AUC ~ phi + tau + wIni + gamma + lambda, data = linearData)
 summary(fit)
 
+plot()
