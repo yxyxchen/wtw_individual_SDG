@@ -119,3 +119,13 @@ ggplot(plotData, aes(HPAUC, LPAUC)) + geom_point(shape = 3 ) + geom_smooth(metho
   xlab('HP AUC/s') + ylab("LP AUC /s") + saveTheme
 fileName = file.path(outFile, "HPAUC_LPAUC.pdf")
 ggsave(fileName, width = 8, height = 8)
+
+
+########### look at raw data ##############
+linearData = as.data.frame(initialSpace);
+colnames(linearData) = c('phi', 'tau', 'gamma', 'lambda', 'wIni')
+linearData$AUC = colpHPData$AUC
+linearData = lapply(linearData[, colnames(linearData)], scale)
+fit = lm(AUC ~ phi + tau + wIni + gamma + lambda, data = linearData)
+summary(fit)
+
