@@ -33,7 +33,7 @@ for(condIdx in 1 : 2){
   nValue = 3
   nComb = nValue ^ nPara
   initialSpace = matrix(NA, nValue^nPara, nPara)
-  initialSpace[,1] = rep(c(0.01, 0.05, 0.2), each = nValue^(nPara - 1)) # phi
+  initialSpace[,1] = rep(c(0.01, 0.05, 0.2), nValue^(nPara - 1)) # phi
   initialSpace[,2] = rep(rep(seq(8, 24, 8), each = nValue), nValue^(nPara - 2)) # tau
   initialSpace[,3] = rep(rep(seq(0.90, 0.98, 0.04), each = nValue^2), nValue^(nPara - 3)) 
   initialSpace[,4] = rep(rep(seq(0.90, 0.98, 0.04), each = nValue^3), nValue^(nPara - 4)) 
@@ -93,10 +93,8 @@ source("subFxs/paraFxs.R")
 for(c in 1: 2){
   cond = conditions[c]
   otherPara = getOtherPara(cond, stepDuration)
-  MSPara = getMSPara(cond, stepDuration, nMS, traceDecay, sigma)  
-  hdrData = c(otherPara, MSPara)
+  hdrData = otherPara
   hdrData$nTimeStep = hdrData$tMax / hdrData$stepDuration
-  hdrData$traceValues = hdrData$traceDecay ^ ( 1 :   hdrData$nTimeStep - 1)
   if(cond == 'unif20') hdrHPData= hdrData else  hdrLPData= hdrData
 }
 fileName = 'outputs/QStarData/hdrData.RData'
