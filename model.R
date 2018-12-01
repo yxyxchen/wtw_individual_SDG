@@ -4,8 +4,8 @@ simulationModel = function(para, otherPara, cond){
   phi = para[1]
   tau = para[2]
   gamma = para[3]
-  lambda = para[4]
-  wIni = para[5]
+  lambda = 1
+  wIni = optimRewardRates[[cond]] / (1 - gamma)
 
   # task para
   source('subFxs/taskFxs.R')
@@ -19,11 +19,12 @@ simulationModel = function(para, otherPara, cond){
   
   ########### simulation repeatedly ############
   # initialize action value, eligibility trace and stat
-  ws = rep(wIni, nTimeStep) # weight vector for "wait", each element for each timeStep
+  Qwait = rep(wIni, nTimeStep) # Q(si, ai = wait), any i
+  Qquit = wIni
   es = rep(0, nTimeStep); # es vector for "wait"
   xs = 1 # every trial starts from the onset state
   
-  # additionally initialize vaWaits and vaQuits
+  # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, blockSecs / iti + 1);
   vaQuits = matrix(NA, nTimeStep, blockSecs / iti + 1);
   
@@ -48,10 +49,12 @@ simulationModel = function(para, otherPara, cond){
         # since we use floor there maybe 0.5 sec error (less than 90 s)
         nAvaStep = min(floor((blockSecs - totalSecs) / stepDuration), nTimeStep)
         
-        # if near the block end, the check total Secs everytime
+        # initialize action 
+        waitRate = exp(Qwait[1] * tau) / sum(exp(Qwait[1]  * tau)  + exp(Qquit * tau))
+        action = ifelse(runif(1) < waitRate, 'wait', 'quit')
         for(t in 1 : nAvaStep){
           # calculte action value 
-          vaQuit = ws[1] * gamma^(iti / stepDuration) # didn't consider iTi, to stop getting things to complex
+          vaQuit = Qquit;
           vaWait = ws[xs];
           vaQuits[t, tIdx] = vaQuit;
           
