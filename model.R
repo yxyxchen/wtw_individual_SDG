@@ -21,8 +21,8 @@ simulationModel = function(para, otherPara, cond){
   # initialize action value, eligibility trace and stat
   Qwait = rep(wIni, nTimeStep) # Q(si, ai = wait), any i
   Qquit = wIni
-  es = rep(0, nTimeStep); # es vector for "wait"
-  xs = 1 # every trial starts from the onset state
+  eWait = rep(0, nTimeStep); # es vector for "wait"
+  eQuit = rep(0, nTimeStep); # es vector for "quit"
   
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, blockSecs / iti + 1);
@@ -49,23 +49,15 @@ simulationModel = function(para, otherPara, cond){
         # since we use floor there maybe 0.5 sec error (less than 90 s)
         nAvaStep = min(floor((blockSecs - totalSecs) / stepDuration), nTimeStep)
         
-        # initialize action 
+        # initialize xs and action
+        xs = 1 
         waitRate = exp(Qwait[1] * tau) / sum(exp(Qwait[1]  * tau)  + exp(Qquit * tau))
         action = ifelse(runif(1) < waitRate, 'wait', 'quit')
+        # keep record 
+        vaQuits[1, tIdx] = Qwait[1] 
+        vaQuits[1, tIdx] = Qquit;
+        
         for(t in 1 : nAvaStep){
-          # calculte action value 
-          vaQuit = Qquit;
-          vaWait = ws[xs];
-          vaQuits[t, tIdx] = vaQuit;
-          
-          # determine action
-          waitRate = exp(vaWait * tau) / sum(exp(vaWait * tau)  + exp(vaQuit * tau) )
-          # when gamma is large, sometimes vaWait will be very large, sothat waitRate is NA
-          if(is.na(waitRate)){
-            waitRate = 1
-          }
-          action = ifelse(runif(1) < waitRate, 'wait', 'quit')
-          
           # next reward 
           # determine whether reward occurs in the step t
           # the previous code is wrong, since rewards happens on 16s seconds woudldn't be counted 
@@ -88,20 +80,22 @@ simulationModel = function(para, otherPara, cond){
           # here stepGap meatured between At and At-1
           junk = rep(0, nTimeStep)
           junk[xs] = 1
-          es =  gamma^stepGap * lambda * es + junk * c(action == "wait")
+          eWait =  gamma^stepGap * lambda * eWait + junk * c(action == "wait")
+          eQuit = gamma ^stepGap * lambda * eQuit + junk * c(action == "quit") 
           
           # update stepGap
           stepGap = ifelse(trialGoOn, 1, iti / stepDuration)
           
           # update action value of quit and wait
           # here stepGap meatured between At and At+1
-          delta = nextReward + c(gamma^(stepGap) * max(ws[nextXs], vaQuit)) -
-                                          ifelse(action == 'wait', vaWait, vaQuit)
+          delta = nextReward + gamma^(stepGap) *
+            (waitRate * Qwait[nextXs] + (1 - waitRate) * Qquit)
+          -ifelse(action == 'wait', vaWait, vaQuit)
           # anything wrong with the delta here?
-          ws = ws + phi * delta * es
+          Qwait = Qwait + phi * delta * es
           
           # save changes in vaWaits, so vaWaited updated at t is used for t+1
-          vaWaits[t, tIdx + 1] = ws[t];
+          vaWaits[t, tIdx + 1] = Qwait[t];
           
           # update xs and stepGap
           xs = nextXs
