@@ -22,13 +22,12 @@ colpTrialEarnings = vector(mode = "list", 2)
 colpTotalEarnings = vector(mode = "list", 2)
 for(c in 1 : 2){
   cond = conditions[c];
-  condName = conditionNames[c];
   
-  if(condName == "HP") inputData = rawHPData else inputData = rawLPData
+  if(cond == "HP") inputData = rawHPData else inputData = rawLPData
   
-  colpTrialEarnings[[condName]] =
+  colpTrialEarnings[[cond]] =
     apply(inputData$trialEarnings, MARGIN = c(1,3), FUN = mean)
-  colpTotalEarnings[[condName]] = apply(colpTrialEarnings[[condName]],
+  colpTotalEarnings[[cond]] = apply(colpTrialEarnings[[cond]],
                                         MARGIN = 1, FUN = sum)
 }
 
@@ -37,12 +36,11 @@ colpAUC = list()
 rawWTW = list()
 for(c in 1 : 2){
   cond = conditions[c];
-  condName = conditionNames[c];
   
   # input
-  if(condName == "HP") inputData = rawHPData else inputData = rawLPData
+  if(cond== "HP") inputData = rawHPData else inputData = rawLPData
   tMax = tMaxs[c]
-  trialTick = trialTicks[[condName]]
+  trialTick = trialTicks[[cond]]
   
   # dim 
   nComb = dim(inputData$timeWaited)[1]
@@ -66,8 +64,8 @@ for(c in 1 : 2){
       wtwResult[i, j, ] = wtwTSSimple(waitDuration, quitIdx, tGrid, tMax)
     } # end of comb
   }# end of condition
-  colpAUC[[condName]] = rowSums(output) / ncol(output)
-  rawWTW[[condName]] = wtwResult
+  colpAUC[[cond]] = rowSums(output) / ncol(output)
+  rawWTW[[cond]] = wtwResult
 }
 
 

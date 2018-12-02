@@ -12,25 +12,24 @@ load('outputs/QStarData/RawHPData.RData')
 load('outputs/QStarData/RawLPData.RData')
 
 ###### choose condition ########3
-condIdx = 1
+condIdx = 2
 cond = conditions[condIdx]
-condName = conditionNames[condIdx]
 
-inputColp = if(condName == 'HP') inputColp = colpHPData else inputColp = colpLPData
-inputRaw = if(condName == 'HP') inputRaw = rawHPData else inputRaw= rawLPData
+inputColp = if(cond == 'HP') inputColp = colpHPData else inputColp = colpLPData
+inputRaw = if(cond == 'HP') inputRaw = rawHPData else inputRaw= rawLPData
 
 tMax = tMaxs[condIdx]
 trialTick = trialTicks[[condIdx]] # so here if use [2] then get a list
 
 ####### view simulation data case by case ##########
 # choose cases you want to plot
-nCombList = which(inputColp$AUC <= 6 & inputColp$AUC >= 2 ) 
+nCombList = which(inputColp$AUC >= 25) 
 nCombList = 1;
 # choose figrues you want to plot
-plotTrialData = F
+plotTrialData = T
 plotKMSC= T
 drawTimeSample = T
-plotActionValue = F
+plotActionValue = T
 # plot
 for (nCb in 1 : length(nCombList)){
   i = nCombList[nCb]
@@ -73,7 +72,7 @@ for (nCb in 1 : length(nCombList)){
 
     
     kmscResults = kmscSimple(blockData$waitDuration, quitIdx, tMax, trialTick)
-    plotData = data.frame(pSurvival = kmscResults$kmOnGrid, time = trialTicks[[condName]])
+    plotData = data.frame(pSurvival = kmscResults$kmOnGrid, time = trialTicks[[cond]])
     p = ggplot(plotData, aes(time, pSurvival)) + geom_line() + ylim(c(0, 1)) + displayTheme +
       ggtitle(label)
     print(p)
@@ -89,7 +88,7 @@ for (nCb in 1 : length(nCombList)){
     cdf = 1 - kmscResults$kmOnGrid;
     cdf[length(cdf)] = 1
     pdf = diff(c(0, cdf)) # hre 0 is the time tick before 0
-    draws = sample(trialTicks[[condName]], size = 1000, replace = TRUE, prob = pdf)
+    draws = sample(trialTicks[[cond]], size = 1000, replace = TRUE, prob = pdf)
     p = ggplot(data.frame(draws),aes(draws)) + geom_histogram(bins = 50) + xlim(c(0 - 1, tMax+3)) +
       displayTheme + xlab('Wait duration / s') + ggtitle(label)
     print(p)
@@ -124,7 +123,7 @@ trialData = allData$trialData
 allIDs = hdrData$ID                   # column of subject IDs
 load('outputs/expData/groupData.RData')
 # choose cases you want to plot 
-nCombList = which(groupData$AUC <= 6 & groupData$AUC >= 2 & groupData$condition == condName)
+nCombList = which(groupData$AUC <= 6 & groupData$AUC >= 2 & groupData$condition == cond)
 for(nCb in 1 : length(nCombList)){
   idx = nCombList[nCb]
   sIdx = ceiling(idx / 2) 
