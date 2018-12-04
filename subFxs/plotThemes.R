@@ -3,11 +3,11 @@
 saveTheme = theme(panel.background = element_rect(fill = "white",colour = "white"),
                 panel.grid.minor = element_blank(),
                 panel.grid.major = element_blank()) + 
-  theme(title =element_text(size = 8, face='bold'), 
+  theme(title =element_text(size = 15, face='bold'), 
         plot.title = element_text(hjust = 0.5)) + 
-  theme(axis.title=element_text(size= 8), axis.text = element_text(size=8), axis.line= element_line(color="black", size = 0.5)) +
-  theme(strip.text = element_text(face="bold", size=8)) + 
-  theme(legend.text=element_text(size= 8))
+  theme(axis.title=element_text(size= 15), axis.text = element_text(size=15), axis.line= element_line(color="black", size = 0.5)) +
+  theme(strip.text = element_text(face="bold", size=15)) + 
+  theme(legend.text=element_text(size= 15))
 
 # plot theme 
 displayTheme = theme(panel.background = element_rect(fill = "white",colour = "white"),

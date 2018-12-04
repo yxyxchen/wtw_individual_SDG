@@ -19,6 +19,7 @@ simulationModel = function(para, otherPara, cond, wIni){
   
   ########### simulation repeatedly ############
   # initialize action value, eligibility trace and stat
+  # exp(-r * stepDuration) = gamma
   Qwait = rep(wIni, nTimeStep) # Q(si, ai = wait), any i
   Qquit = wIni * gamma ^(iti / stepDuration)
   eWait = rep(0, nTimeStep); # es vector for "wait"

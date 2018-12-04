@@ -96,3 +96,23 @@ optimRewardRates$LP = max(LP)
 #   ylab('Total Earnings / cent') + ggtitle('Expected payoff functions') + saveTheme
 # ggsave('../outputs/exp_figures/expected_payoff.png', width = 3, height = 2)
 
+
+#### calculate action value #######
+# suppose the strategy is always wait
+# using specific discount
+# assume rewards all arrives at the right side 
+r = 0.5
+for(c in 1 : 2){
+  cond = conditions[c]
+  trialTick = trialTicks[[cond]]
+  nTicks = length(trialTick)
+  thisDelayPDF = rewardDelayPDF[[cond]]
+  # 
+  actionValueWaits = rep(0, nTicks)
+  for(i in 1 : nTicks){
+    actionValueWaits[i] = sum(tokenValue * exp(- (trialTick[i : nTicks] - trialTick[i]) * r)* thisDelayPDF[i : nTicks] / sum( thisDelayPDF[i : nTicks]))    
+  }
+  if(c == 1) HP = actionValueWaits else LP = actionValueWaits
+}
+
+
