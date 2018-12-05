@@ -23,7 +23,7 @@ simulationModel = function(para, otherPara, cond, wIni){
   Qwait = rep(wIni, nTimeStep) # Q(si, ai = wait), any i
   Qquit = wIni * gamma ^(iti / stepDuration)
   eWait = rep(0, nTimeStep); # es vector for "wait"
-  eQuit = 1; # es vector for "quit"
+  eQuit = 0; # es vector for "quit"
   
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, blockSecs / iti + 1);
@@ -42,6 +42,12 @@ simulationModel = function(para, otherPara, cond, wIni){
   trialEarnings = rep(0, blockSecs / iti + 1)
   timeWaited = rep(0, blockSecs / iti + 1)
   
+  
+  # initialize xs and action
+  xs = 1 
+  waitRate = 1 / sum(1  + exp((Qquit - Qwait[1])* tau))
+  action = ifelse(runif(1) < waitRate, 'wait', 'quit')
+  
   # loop until time runs out
       while(totalSecs < blockSecs) {
         tIdx = tIdx + 1
@@ -51,11 +57,6 @@ simulationModel = function(para, otherPara, cond, wIni){
         # calculaye available time steps
         # since we use floor there maybe 0.5 sec error (less than 90 s)
         nAvaStep = min(floor((blockSecs - totalSecs) / stepDuration), nTimeStep)
-        
-        # initialize xs and action
-        xs = 1 
-        waitRate = 1 / sum(1  + exp((Qquit - Qwait[1])* tau))
-        action = ifelse(runif(1) < waitRate, 'wait', 'quit')
 
         for(t in 1 : nAvaStep){
           # next reward 
@@ -123,7 +124,6 @@ simulationModel = function(para, otherPara, cond, wIni){
             # if quit, quit at t, if wait, wait until t+1
             timeWaited[tIdx] = ifelse(getReward,NA, ifelse(action == "quit", timeTicks[t], timeTicks[t+1]))
             rewardDelays[tIdx] = rewardDelay
-            eQuit = gamma ^stepGap * lambda * eQuit + 1
             break
           }
         }  # one trial end

@@ -23,7 +23,7 @@ trialTick = trialTicks[[condIdx]] # so here if use [2] then get a list
 
 ####### view simulation data case by case ##########
 # choose cases you want to plot
-nCombList = which(inputColp$AUC >= 15) 
+nCombList = which(inputColp$AUC < 6 && inputColp$AUC < 3) 
 # choose figrues you want to plot
 plotTrialData = T
 plotKMSC= T
