@@ -1,7 +1,7 @@
 # this simulation using average payoff
 
 ### output file ####
-outFile = 'outputs/QStarData'
+outFile = 'outputs/simData'
 dir.create(outFile)
 ################## read data #################
 # library 
@@ -27,7 +27,7 @@ for(c in 1: 2){
   hdrData$nTimeStep = hdrData$tMax / hdrData$stepDuration
   if(cond == 'HP') hdrHPData= hdrData else  hdrLPData= hdrData
 }
-fileName = 'outputs/QStarData/hdrData.RData'
+fileName = 'outputs/simData/hdrData.RData'
 save(hdrHPData, hdrLPData, file = fileName)
 
 ############# simulate for the distribution of toalEarnings ##########
@@ -65,7 +65,7 @@ for(c in 1 : 2){
 nRep = 5
 count = t(matrix(1 : (nComb * nRep), nRep, nComb))
 save('initialSpace', 'nValue', 'nPara', 'paraNames', 'nComb', 'wInis', 'count',
-     file = 'outputs/QStarData/initialSpace.RData')
+     file = 'outputs/simData/initialSpace.RData')
 
 
 ################ input ################
@@ -119,7 +119,7 @@ for(condIdx in 1 : 2){
   )
   
     
-  outFile = 'QStarData'
+  outFile = 'simData'
   if(cond == "HP"){
     rawHPData = outputData
     packHPData = thisPackData
