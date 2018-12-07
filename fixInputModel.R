@@ -54,7 +54,7 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
       # next reward 
       # determine whether reward occurs in the step t
       # the previous code is wrong, since rewards happens on 16s seconds woudldn't be counted 
-      rewardOccur = rewardDelay <= timeTicks[t + 1] && rewardDelay > timeTicks[t] 
+      rewardOccur = (rewardDelay <= timeTicks[t + 1] && rewardDelay > timeTicks[t])
       
       # if rewarded and wait, 5; otherwise, 0
       getReward = (action == 'wait' && rewardOccur);
@@ -114,8 +114,7 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
       if(!trialGoOn){
         trialEarnings[tIdx] = ifelse(nextReward == tokenValue, tokenValue, 0);
         # if quit, quit at t, if wait, wait until t+1
-        timeWaited[tIdx] = ifelse(getReward,NA, ifelse(action == "quit", timeTicks[t], timeTicks[t+1]))
-        rewardDelays[tIdx] = rewardDelay
+        timeWaited[tIdx] = ifelse(getReward, rewardDelay, ifelse(action == "quit", timeTicks[t], timeTicks[t+1]))
         break
       }
     }  # one trial end
