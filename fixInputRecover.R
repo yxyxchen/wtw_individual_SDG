@@ -8,6 +8,7 @@ library(nloptr)
 # resimulate the
 source('subFxs/wtwSettings.R') 
 source('subFxs/paraFxs.R') 
+source('subFxs/taskFxs.R')
 source('eval_f.R')
 load('outputs/fixInputSimData/fixInputs.RData')# load rewardDelays
 
@@ -15,11 +16,6 @@ load('outputs/fixInputSimData/fixInputs.RData')# load rewardDelays
 load('outputs/simData/initialSpace.RData')
 load('outputs/fixInputSimData/rawLPData.RData')
 
-
-
-################## compare waitDurations across para
-ggplot(colpHPData, aes(dvSucessRecover)) + geom_histogram()
-ggplot(colpHPData, aes(waitSucessRecover)) + geom_histogram()
 
 ################## recover parameters by MLE ##############
 stepDuration = 0.5
@@ -53,7 +49,7 @@ trueDvs = transVaWaits(vaWaits) - transVaQuits(vaQuits)
 x0 = c(0.1, 5, 0.5)
 local_optimizer = list(algorithm = "NLOPT_GN_MLSL_LDS", maxeval = 1e4)
 opts = list(algorithm = "NLOPT_LN_BOBYQA", stopval =0.1,
-            local_optimizer = local_optimizer) 
+            local_optimizer = local_optimizer, print_level = 1) 
 res = nloptr(x0 = x0, eval_f = eval_f_dv, lb = c(0, 0, 0) , ub = c(1, Inf, 1),
              opts = opts,
              otherPara = otherPara, cond = cond, wIni = wIni,
