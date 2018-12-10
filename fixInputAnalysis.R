@@ -165,7 +165,7 @@ for(cIdx in 1 : 2){
   
   ggplot(data = plotData, aes(i, j)) + geom_tile(aes(fill = delta)) +
     scale_fill_gradient(low = "white", high = "red", name = expression(Delta~"dv")) +coord_fixed(ratio = 1) + xlab('Comb No.')+  ylab('Comb No.')+
-    saveTheme + ggtitle(cond) ＋ geom_abline(slope = 1, intercept = 0)
+    saveTheme + ggtitle(cond) +  geom_abline(slope = 1, intercept = 0)
   fileName = sprintf('outputs/fixInputSim_figures/deltaDv_%s.pdf', cond)
   ggsave(fileName, width = 6, height = 6) 
   
