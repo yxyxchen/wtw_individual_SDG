@@ -36,7 +36,7 @@ paraNames = c('phi', 'tau', 'gamma')
 nValue = 5
 nComb = nValue ^ nPara
 initialSpace = matrix(NA, nValue^nPara, nPara)
-initialSpace[,1] = rep(exp(seq(-4, -0.7, length.out = 5)), nValue^(nPara - 1)) # phi
+initialSpace[,1] = rep(seq(0.1, 0.5, by = 0.1), nValue^(nPara - 1)) # phi
 initialSpace[,2] = rep(rep(seq(2, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
 initialSpace[,3] = rep(seq(0.8, 0.98, length.out = 5), each = nValue^2)
 
@@ -49,16 +49,14 @@ for(c in 1 : 2){
   thisDelayPDF = rewardDelayPDF[[cond]]
   nTicks = length(trialTick)
   
-  junk = rep(0, nComb);
-  for(i in 1 : nComb){
-    para = initialSpace[i,]
-    r = - log(para[3]) / stepDuration
-    actionValueWaits = rep(0, nTicks)
-    for(k in 1 : nTicks){
-      actionValueWaits[k] = sum(tokenValue * exp(- (trialTick[k : nTicks] - trialTick[k]) * r)* thisDelayPDF[k : nTicks] / sum( thisDelayPDF[k : nTicks]))    
-    }
-    junk[i] = mean(actionValueWaits)    
+  # assume gamma = 0.9
+  gamma = 0.9
+  r = - log(gamma) / stepDuration
+  actionValueWaits = rep(0, nTicks)
+  for(k in 1 : nTicks){
+    actionValueWaits[k] = sum(tokenValue * exp(- (trialTick[k : nTicks] - trialTick[k]) * r)* thisDelayPDF[k : nTicks] / sum( thisDelayPDF[k : nTicks]))    
   }
+  junk = mean(actionValueWaits)    
   wInis[[cond]] = junk
 }
 
@@ -73,7 +71,7 @@ save('initialSpace', 'nValue', 'nPara', 'paraNames', 'nComb', 'wInis', 'count',
 for(condIdx in 1 : 2){
   thisPackData = vector(length = nComb * nRep, mode ='list')
   cond = conditions[condIdx];
-  thisWinis = wInis[[cond]]
+  wIni = wInis[[cond]]
   
   sprintf('Condition : %s %s', cond, cond)
   
@@ -97,8 +95,7 @@ for(condIdx in 1 : 2){
   vaWaits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, blockSecs / iti + 1))
   
   for(h in 1 : nrow(initialSpace)){
-    para = initialSpace[h,]
-    wIni = thisWinis[h];
+    para = initialSpace[h,];
     # calculate wIni
     for(j in 1 : nRep ){
       tempt=  simulationModel(para,otherPara, cond, wIni)

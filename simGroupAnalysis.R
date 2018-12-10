@@ -10,15 +10,15 @@ source(file = './subFxs/plotThemes.R')
 source(file = './subFxs/wtwSettings.R')
 
 # load the para space of the simulation
-load('outputs/QStarData/initialSpace.RData')
+load('outputs/simData/initialSpace.RData')
 
 # load simulation data 
-load('outputs/QStarData/colpData.RData')
-load('outputs/QStarData/rawWTW.RData')
-load('outputs/QStarData/hdrData.RData')
+load('outputs/simData/colpData.RData')
+load('outputs/simData/rawWTW.RData')
+load('outputs/simData/hdrData.RData')
 
 # define output file
-outFile = 'outputs/QStar_figures'
+outFile = 'outputs/sim_figures'
 dir.create(outFile)
 
 ####### plot distribution of totalEarnings

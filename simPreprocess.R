@@ -4,16 +4,14 @@
 
 
 ############# load data and functions ######
-load('outputs/QStarData/rawHPData.RData')
-load('outputs/QStarData/rawLPData.RData')
-load('outputs/QstarData/hdrData.RData')
+load('outputs/simData/rawHPData.RData')
+load('outputs/simData/rawLPData.RData')
+load('outputs/simData/hdrData.RData')
 library("dplyr")
 library("tidyr")
 source('subFxs/plotThemes.R')
 source('subFxs/wtwSettings.R')
 source('subFxs/helperFxs.R')
-## outFile
-outFile = 'outputs/QStarData'
 
 
 ############ calculate colpData ########
@@ -79,7 +77,7 @@ colpLPData = list(totalEarnings = colpTotalEarnings$LP,
                   AUC = colpAUC$LP,
                   wtw = apply(rawWTW$LP, MARGIN = 1, mean)
 )
-fileName = sprintf("%s/colpData.RData", outFile)
+fileName = "outputs/simData/colpData.RData"
 save('colpLPData', 'colpHPData', file = fileName )
-fileName = sprintf("%s/rawWTW.RData", outFile)
+fileName = "outputs/simData/rawWTW.RData"
 save('rawWTW', file = fileName)

@@ -34,12 +34,14 @@ for(cIdx in 1 : 2){
 save('nTrials', 'nRep', 'rewardDelays', file = 'outputs/fixInputSimData/fixInputs.RData')
 
 ################## simulation ##########
+set.seed(123)
 for(cIdx in 1 : 2){
   # define the condition
   cond = conditions[cIdx]
   # get otherPara given the condition
   otherPara = getOtherPara(cond, stepDuration)
   tMax = otherPara$tMax
+  wIni = wInis[[cond]]
   
   # 
   thisRewardDelays = rewardDelays[[cond]]
@@ -53,7 +55,6 @@ for(cIdx in 1 : 2){
   # simulate for every para
   for(i in 1 : nComb){
     para = initialSpace[i, ]
-    wIni = wInis[[cond]][i]
     for(j in 1 : nRep){
       tempt = fixInputModel(para, otherPara, cond, wIni, thisRewardDelays)
       junk = tempt[['trialEarnings']]
@@ -69,8 +70,6 @@ for(cIdx in 1 : 2){
       dvs[i, j, , ] = junk
     }
   }
-  
-  
 
   # organize and save outputs 
   outputData = list("timeWaited" = TimeWaited, "trialEarnings" = TrialEarnings,

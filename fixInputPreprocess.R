@@ -113,4 +113,4 @@ colpLPData = data.frame(waitSucessRecover  = waitSucessRecover$LP,
                   dvAcrossDelta = dvAcrossDelta$LP,
                   AUC = AUC$LP)
 save('colpLPData', 'colpHPData', file = 'outputs/fixInputSimData/colpData.RData' )
-
+save('dvDelta', 'waitDelta', file = 'outputs/fixInputSimData/pairCompareData.RData')
