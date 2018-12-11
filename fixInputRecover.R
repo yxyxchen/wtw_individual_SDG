@@ -69,23 +69,8 @@ for(condIdx in 1 : 2){
 save(file = 'outputs/fixInputSimData/waitRecover.RData', 'LLs', 'solutions')
 
 #############
-junkData = data.frame(solutions$LP, initialSpace)
-colnames(junkData) = c('phiHat', 'tauHat', 'gammaHat', 'phi', 'tau', 'gamma')
-plotData = summarise(group_by(junkData, phi), mu = mean(phiHat), std =sd(phiHat))
-junkData$phi = factor(junkData$phi)
-junkData$tau= factor(junkData$tau)
-junkData$gamma = factor(junkData$gamma)
-ggplot(junkData, aes(phi, phiHat)) + geom_boxplot() + saveTheme
-ggsave('outputs/fixInputSim_figures/waitRecoverPhi.pdf',
-       width = 6, height = 3)
 
-ggplot(junkData, aes(tau, tauHat)) + geom_boxplot() + saveTheme
-ggsave('outputs/fixInputSim_figures/waitRecoverTau.pdf',
-       width = 6, height = 3)
 
-ggplot(junkData, aes(gamma, gammaHat)) + geom_boxplot() + saveTheme
-ggsave('outputs/fixInputSim_figures/waitRecoverGamma.pdf',
-       width = 6, height = 3)
 
 #################### for vaWaits and vaQuits ###############
 # loop across conditions
@@ -113,8 +98,8 @@ for(condIdx in 1 : 2){
     for(sIdx in 1 : nrow(startPoints)){
       x0 = startPoints[sIdx, ]
       local_optimizer = list(algorithm = "NLOPT_GN_MLSL_LDS", maxeval = 1e4)
-      opts = list(algorithm = "NLOPT_LN_BOBYQA", stopval =0.1,
-                  local_optimizer = local_optimizer, print_level = 1) 
+      opts = list(algorithm = "NLOPT_LN_BOBYQA", stopval =10,
+                  local_optimizer = local_optimizer) 
       res = nloptr(x0 = x0, eval_f = eval_f_dv, lb = c(0, 0, 0) , ub = c(1, Inf, 1),
                    opts = opts,
                    otherPara = otherPara, cond = cond, wIni = wIni,
@@ -131,7 +116,7 @@ for(condIdx in 1 : 2){
   solutions[[cond]] = thisSolutions
   
 }
-save(file = 'outputs/fixInputSimData/waitRecover.RData', 'LLs', 'solutions')
+save(file = 'outputs/fixInputSimData/dvRecover.RData', 'LLs', 'solutions')
 
 
 
