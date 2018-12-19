@@ -14,23 +14,7 @@ source('subFxs/wtwSettings.R') # wtw settings for both HP and LP
 source('subFxs/paraFxs.R') # functions to get MSPara and otherPara from inputs and wtwSettings
                     # can change for different MS model, and 
 
-######## generate hdrData ######
-# hdrData include otherPara, MSPara
-# also nTimeStep and TraceValue 
-# therefore, no need to call getPara in later analysis anymore
-stepDuration = 0.5
-source("subFxs/paraFxs.R")
-for(c in 1: 2){
-  cond = conditions[c]
-  otherPara = getOtherPara(cond, stepDuration)
-  hdrData = otherPara
-  hdrData$nTimeStep = hdrData$tMax / hdrData$stepDuration
-  if(cond == 'HP') hdrHPData= hdrData else  hdrLPData= hdrData
-}
-fileName = 'outputs/simData/hdrData.RData'
-save(hdrHPData, hdrLPData, file = fileName)
-
-############# simulate for the distribution of toalEarnings ##########
+############# generate the parameter search space ##########
 nPara = 3
 paraNames = c('phi', 'tau', 'gamma')
 nValue = 5

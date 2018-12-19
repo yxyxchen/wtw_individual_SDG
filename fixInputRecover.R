@@ -17,7 +17,6 @@ load('outputs/simData/initialSpace.RData')
 load('outputs/fixInputSimData/rawLPData.RData')
 load('outputs/fixInputSimData/rawHPData.RData')
 ################ initial start points space ############
-
 startPoints = matrix(NA, 3 ^ 3,3)
 startPoints[,1] = rep(c(0.05, 0.15, 0.35), each = 3 ^ 2)
 startPoints[,2] = rep(c(1, 5, 15), each = 3 , 3)
@@ -32,12 +31,14 @@ for(condIdx in 1 : 2){
   otherPara = getOtherPara(cond, stepDuration)
   thisRewardDelays = rewardDelays[[cond]]
   if(condIdx == 1) rawData = rawHPData else rawData = rawLPData
+  wIni = wInis[[cond]]
   
+  # initialize the output
   thisLLs = vector(length = nComb)
   thisSolutions = matrix(NA, nComb, nPara)
   
   for(combIdx in 1 : 62){
-    wIni = wInis[[cond]]
+    
     para = initialSpace[combIdx, ]
     timeWaited = rawData$timeWaited[combIdx, 1, 1 : nTrials ]
     paste(sprintf('cond: %s, para: ', cond), round(para[1],2), para[2], para[3])
