@@ -9,7 +9,7 @@ nBlock = 3
 cat('Analyzing data for n','=',n,'subjects.\n')
 
 # parameters 
-para = c(0.1, 5, 0.95)
+para = c(0.2, 10, 0.90)
 
 
 # load scripts, libraries and data for simulation 
@@ -58,10 +58,35 @@ aucLP = groupData$AUC[ groupData$condition == 'LP']
 
 aucHPSim = aucDataMu[groupData$condition == 'HP']
 aucLPSim = aucDataMu[groupData$condition == 'LP']
+
+
 cor.test(aucHP, aucHPSim)
 cor.test(aucLP, aucLPSim)
 
-plot(sort(aucHPSim),  aucHP[order(aucHPSim)])
+###### plot
+library('ggplot2')
+source('subFxs/plotThemes.R')
+plotData = data.frame(auc = c(aucHP, aucLP), aucSim = c(aucHPSim, aucLPSim),
+                      condition = rep(c('HP', 'LP'), each = length(aucHP)))
 
-plot(sort(aucLPSim),  aucHP[order(aucLPSim)])
+# HP
+corResults= cor.test(aucHP, aucHPSim)
+ggplot(plotData[plotData$condition == 'HP', ], aes(aucSim, auc)) + geom_point() + saveTheme +
+  ggtitle('HP') + geom_smooth(method = 'lm') +
+  annotate("text", x = 14, y = 10,
+           label = sprintf('%.2f(p = %.2f)', corResults$estimate, corResults$p.value),
+           size = 6, color = 'blue')
+dir.create('outputs/seq_figures')
+ggsave('outputs/seq_figures/HP.pdf', width = 6, height = 4)
+
+
+# LP
+corResults= cor.test(aucLP, aucLPSim)
+ggplot(plotData[plotData$condition == 'LP', ], aes(aucSim, auc)) + geom_point() + saveTheme +
+  ggtitle('LP') + geom_smooth(method = 'lm') +
+  annotate("text", x = 8, y = 30,
+           label = sprintf('%.2f(p = %.2f)', corResults$estimate, corResults$p.value),
+           size = 6, color = 'blue')
+ggsave('outputs/seq_figures/LP.pdf', width = 6, height = 4)
+
 

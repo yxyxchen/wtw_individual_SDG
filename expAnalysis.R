@@ -38,7 +38,19 @@ stressByBlock = vector(length= n * nBlock)
 wtw = matrix(NA, length(tGrid), n * nBlock)
 cumEarn = matrix(NA, length(tGrid), n * nBlock)
 
-
+# reaction time analysis 
+for(sIdx in 1 : n){
+  thisID = allIDs[sIdx]
+  thisTrialData = trialData[[thisID]]
+  unique(thisTrialData$condition)
+  thisTrialData = thisTrialData[thisTrialData$blockNum == 2, ]
+  thisRT = thisTrialData$timeWaited - thisTrialData$rewardTime;
+  thisRewardDelays = thisTrialData$scheduledWait
+  plotData = data.frame(RT = thisRT[!is.nan(thisRT)],
+                        rewardDelay = thisRewardDelays[!is.nan(thisRT)])
+  
+  ggplot(plotData, aes(rewardDelay, RT)) + geom_point()
+}
 # descriptive statistics for individual subjects and blocks
 for (sIdx in 1:n) {
   thisID = allIDs[sIdx]
