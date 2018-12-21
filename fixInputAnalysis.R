@@ -9,7 +9,7 @@ load('outputs/fixInputSimData/rawLPData.RData')
 load('outputs/fixInputSimData/colpData.RData')
 load('outputs/simData/initialSpace.RData')
 
-################## compare waitDurations across para
+################## compare dvRecover and waitRecover ######################
 plotData = data.frame(condition = rep(c('HP', 'LP'), each = nComb), 
                       dvSucessRecover = c(colpHPData$dvSucessRecover, colpLPData$dvSucessRecover),
                       waitSucessRecover = c(colpHPData$waitSucessRecover, colpLPData$waitSucessRecover))
@@ -18,14 +18,6 @@ ggplot(plotData, aes(dvSucessRecover, fill = condition)) + geom_histogram(bins =
   xlab(expression("p(within"~Delta~"dv"~"<"~"across"~Delta~'dv)')) + saveTheme
 ggsave(filename = 'outputs/fixInputSim_figures/dvSucessRecover.pdf', width = 8, height = 4)
 
-
-plotData = data.frame(condition = rep(c('HP', 'LP'), each = nComb), 
-                      dvSucessRecover = c(colpHPData$dvSucessRecover, colpLPData$dvSucessRecover),
-                      waitSucessRecover = c(colpHPData$waitSucessRecover, colpLPData$waitSucessRecover))
-ggplot(plotData, aes(dvSucessRecover, fill = condition)) + geom_histogram(bins = 30) +facet_grid(.~condition) +
-  scale_fill_manual(values = c(conditionColors))+
-  xlab(expression("p(within"~Delta~"dv"~"<"~"across"~Delta~'dv)')) + saveTheme
-ggsave(filename = 'outputs/fixInputSim_figures/dvSucessRecover.pdf', width = 8, height = 4)
 
 ggplot(plotData, aes(waitSucessRecover, fill = condition)) + geom_histogram(bins = 30) +facet_grid(.~condition) +
   scale_fill_manual(values = c(conditionColors))+
@@ -33,7 +25,31 @@ ggplot(plotData, aes(waitSucessRecover, fill = condition)) + geom_histogram(bins
 ggsave(filename = 'outputs/fixInputSim_figures/waitSucessRecover.pdf', width = 8, height = 4)
 
 
-########## 
+########## summarise withinDelta, grouped by para ##########
+# 
+plotData = data.frame(withinDelta = c(colpHPData$waitWithinDelta, colpLPData$waitAcrossDelta),
+                      LL = c(colpHPData$waitWithinDelta, colpLPData$waitAcrossDelta) ^ 2,
+                      phi = rep(initialSpace[,1], 2), tau = rep(initialSpace[,2],2),
+                      gamma = rep(initialSpace[,3],2), condition = rep(c('HP', 'LP'), each = nrow(initialSpace)))
+
+ggplot(plotData, aes(LL, fill = condition)) + geom_histogram(bins = 10) + facet_grid(~condition)+
+  scale_fill_manual(values = conditionColors) + saveTheme
+ggsave('outputs/fixInputSim_figures/LL.pdf', width = 6, height = 3)
+
+
+plotData = summarise(group_by(plotData, condition, phi), mu = mean(withinDelta), sd = std(withinDelta))
+ggplot(plotData, aes)
+
+
+plotData = data.frame(withinDelta = colpHPData$waitWithinDelta, phi = initialSpace[,1],
+                      tau = initialSpace[,2], gamma = initialSpace[,3])
+summarise(group_by(plotData, phi), mu = mean(withinDelta))
+
+summarise(group_by(plotData, tau), mu = mean(withinDelta))
+
+summarise(group_by(plotData, gamma), mu = mean(withinDelta))
+
+# dv
 plotData = data.frame(withinDelta = colpHPData$dvWithinDelta, phi = initialSpace[,1],
                       tau = initialSpace[,2], gamma = initialSpace[,3])
 summarise(group_by(plotData, phi), mu = mean(withinDelta))
