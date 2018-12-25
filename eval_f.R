@@ -246,8 +246,8 @@ eval_f_dv = function(x, otherPara, cond, wIni, rewardDelays, trueDvs){
 ##############################
 # eval_f_action
 ##############################s
-eval_f_action = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
-  # set.seed(123)
+negLikActio  = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
+  # parse learning para
   para = x
   phi = para[1]
   tau = para[2]
@@ -258,27 +258,64 @@ eval_f_action = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
   source('subFxs/taskFxs.R')
   source("subFxs/wtwSettings.R")
   nStepDuration = 0.5
-  # read otherPara
+  
+  # parse otherPara
   tMax= otherPara[['tMax']]
   stepDuration = otherPara[['stepDuration']]
   timeTicks = otherPara[['timeTicks']] # begin timepoint of states
-  nTimeStep = tMax / stepDuration
   nTrial = length(rewardDelays)
   
-  
-  ########### simulation repeatedly ############
-  # initialize action value, eligibility trace and stat
-  # exp(-r * stepDuration) = gamma
+  # initialize action values, eligibility traces and lik
   Qwait = rep(wIni, nTimeStep) 
   Qquit = wIni * gamma ^(iti / stepDuration)
   eWait = rep(0, nTimeStep); # es vector for "wait"
   eQuit = 0; # es vector for "quit"
-  
-  # initialize LL
   lik = 0
   
-  # loop until time runs out
-  for(tIdx in 1 : nTrial) {
+  # loop over trials
+  for(tIdx in 1 : nTrial){
+    nTimePoint = getNTimePoint(trialEarnings[tIdx],
+                               timeWaited[tIdx], stepDuration)
+    while(t <= nTimePoint){
+      # update lik
+      lik = lik + tau* Qwait[t] - log(exp(sum(tau * (Qquit + Qwait[t] ))))
+      
+      # determine action, nextReward, 
+      action = getAction(trialEarnings[tIdx], tIdx, nTrial)
+      
+    }
+  }
+  
+  # loop before the last trial
+  for(tIdx in 1 : (nTrial - 1)) {
+      nTimepoint = ceiling(timeWaited[tIdx] / nStepDuration) # number of timepoints to make decisions 
+      while(t <= nTimepoint){
+        lik = lik + tau* Qwait[t] - log(exp(sum(tau * (Qquit + Qwait[t] ))))
+        
+        action = 'wait'
+        nextReward = ifelse(t == waitTimePoints, tokenValue, 0)
+        nextAction = ifelse(t == waitTimePoints, actionNextTrial, 'wait')
+        stepGap = ifelse(t == waitTimePoints, 1, iti / stepDuration + 1)
+        nextT = ifelse(t == waitTimePoints, xs+1, 1)
+        
+        junk = rep(0, nTimeStep + 1)
+        junk[t] = 1
+        eWait =  gamma^stepGap * lambda * eWait + junk * c(action == "wait")
+        eQuit = gamma ^stepGap * lambda * eQuit + c(action == "quit") 
+        
+        delta = nextReward + gamma^(stepGap) * ifelse(nextAction == 'wait',  Qwait[nextXs], Qquit)-ifelse(action == 'wait', Qwait[xs], Qquit)
+        # anything wrong with the delta here?
+        Qwait = Qwait + phi * delta * eWait
+        Qquit = Qquit + phi * delta * eQuit
+        xs = nextXs
+      }
+      
+    }
+    
+    
+ 
+    
+    
     # make decision when time >= waitDuration
     # for simulation data without rewards, t = waitDuration, quit at the beginning (t, t + 0.5]
     # for simulation data with rewards and experimental data, t > waitDuration, quit after well over the reward timing  
