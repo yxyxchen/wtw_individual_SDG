@@ -43,6 +43,7 @@ for(sIdx in 1 : n){
   thisRewardDelays = thisTrialData$scheduledWait
   thisTimeWaited = thisTrialData$timeWaited
   thisTrialEarn = thisTrialData$trialEarnings
+  # since the real waiting time is recorded, however, waiting longer than the reward didn't make sense
   thisTimeWaited[thisTrialEarn == tokenValue] = thisRewardDelays[thisTrialEarn == tokenValue] 
   
   # para fitting

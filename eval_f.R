@@ -243,3 +243,94 @@ eval_f_dv = function(x, otherPara, cond, wIni, rewardDelays, trueDvs){
   return(LL)
 } #end of the function
 
+##############################
+# eval_f_action
+##############################s
+eval_f_action = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
+  # set.seed(123)
+  para = x
+  phi = para[1]
+  tau = para[2]
+  gamma = para[3]
+  lambda = 1
+  
+  # task para
+  source('subFxs/taskFxs.R')
+  source("subFxs/wtwSettings.R")
+  nStepDuration = 0.5
+  # read otherPara
+  tMax= otherPara[['tMax']]
+  stepDuration = otherPara[['stepDuration']]
+  timeTicks = otherPara[['timeTicks']] # begin timepoint of states
+  nTimeStep = tMax / stepDuration
+  nTrial = length(rewardDelays)
+  
+  
+  ########### simulation repeatedly ############
+  # initialize action value, eligibility trace and stat
+  # exp(-r * stepDuration) = gamma
+  Qwait = rep(wIni, nTimeStep) 
+  Qquit = wIni * gamma ^(iti / stepDuration)
+  eWait = rep(0, nTimeStep); # es vector for "wait"
+  eQuit = 0; # es vector for "quit"
+  
+  # initialize LL
+  lik = 0
+  
+  # loop until time runs out
+  for(tIdx in 1 : nTrial) {
+    # make decision when time >= waitDuration
+    # for simulation data without rewards, t = waitDuration, quit at the beginning (t, t + 0.5]
+    # for simulation data with rewards and experimental data, t > waitDuration, quit after well over the reward timing  
+    # ceiling to get the index of the gap, and + 1 to get the decisionTimePoint
+    
+    decisionTimePoint = ceiling(timeWaited[tIdx] / nStepDuration) + 1;
+    # if wait for tMax, then no decision is needed, quit imedietely
+    decisionTimePoint = min(decisionTimePoint, tMax / stepDuration)
+      
+    for(t in 1 : decisionTimePoint){
+      # update LL
+      lik = lik + tau* Qwait[t] - log(exp(sum(tau * (Qquit + Qwait[t] ))))
+      # determine action, stepGap and nextReward
+      if(t < decisionTimePoint){
+        # always wait before the decision time Point
+        action = 'wait';
+        stepGap = 1
+        nextReward = 0
+        nextAction = ifelse(t == decisionTimePoint - 1 && trialEarnings[tIdx] == 0, 'wait', 'quit')
+      }else{
+        # no rewards usually mean quitting, except at the last trial, which we ingnore here
+        if(trialEarnings[tIdx] == 0){
+          action = 'quit'
+          stepGap = iti /stepDuration
+          nextReward = 0
+        }else{
+          action = 'wait'
+          stepGap = iti /stepDuration + 1
+          nextReward = tokenValue
+        }
+        if(timeWaited[tIdx + 1] == 0){
+          nextAction = 'quit'
+        }else{
+          nextAction = 'wait'
+        }
+      }
+      # update eligilibity trace
+      # here stepGap meatured between At and At-1
+      junk = rep(0, nTimeStep + 1)
+      junk[t] = 1
+      eWait =  gamma^stepGap * lambda * eWait + junk * c(action == "wait")
+      eQuit = gamma ^stepGap * lambda * eQuit + c(action == "quit") 
+      
+      # update action value of quit and wait
+      # here stepGap meatured between At and At+1
+      delta = nextReward + gamma^(stepGap) * ifelse(nextAction == 'wait',  Qwait[t+1], Qquit)-ifelse(action == 'wait', Qwait[t], Qquit)
+      # anything wrong with the delta here?
+      Qwait = Qwait + phi * delta * eWait
+      Qquit = Qquit + phi * delta * eQuit
+      # quit point sholdn;t have reward
+    }  # one trial end
+  } # simulation end
+  LL = -lik
+  return(LL)
+} #end of the function

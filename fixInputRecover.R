@@ -121,8 +121,51 @@ save(file = 'outputs/fixInputSimData/dvRecover.RData', 'LLs', 'solutions')
 
 
 
+#################### for vaWaits and vaQuits ###############
+# loop across conditions
+LLs = list()
+solutions = list()
+for(condIdx in 1 : 2){
+  cond = conditions[condIdx]
+  otherPara = getOtherPara(cond, stepDuration)
+  thisRewardDelays = rewardDelays[[cond]]
+  if(condIdx == 1) rawData = rawHPData else rawData = rawLPData
+  
+  thisLLs = vector(length = nComb)
+  thisSolutions = matrix(NA, nComb, nPara)
+  
+  for(combIdx in 1 : nComb){
+    wIni = wInis[[cond]]
+    para = initialSpace[combIdx, ]
+    timeWaited = rawData$timeWaited[combIdx, 1, 1 : nTrials ]
+    trialEarnings = rawData$trialEarnings[combIdx, 1, 1 : nTrials ]
+    paste(sprintf('cond: %s, para: ', cond), round(para[1],2), para[2], para[3])
+    # initialize
+    LL = 1e5
+    solution = vector(length = nPara)
+    for(sIdx in 1 : nrow(startPoints)){
+      x0 = startPoints[sIdx, ]
+      local_optimizer = list(algorithm = "NLOPT_GN_MLSL_LDS", maxeval = 1e4)
+      opts = list(algorithm = "NLOPT_LN_BOBYQA", stopval =10,
+                  local_optimizer = local_optimizer) 
+      res = nloptr(x0 = x0, eval_f = eval_f_action, lb = c(0, 0, 0) , ub = c(1, Inf, 1),
+                   opts = opts,
+                   otherPara = otherPara, cond = cond, wIni = wIni,
+                   trialEarnings = trialEarnings, timeWaited =  timeWaited)
+      if(res$objective < LL){
+        LL = res$objective
+        solution = res$solution
+      }
+    }# end of loop across starting points
+    thisLLs[combIdx] = LL
+    thisSolutions[combIdx,] = solution
+  }
+  LLs[[cond]] = thisLLs
+  solutions[[cond]] = thisSolutions
+  
+}
+save(file = 'outputs/fixInputSimData/actionRecover.RData', 'LLs', 'solutions')
 
-
-x0 = c(0.1, 5, 0.5)
-
+eval_f_action(x0, otherPara, cond, wIni, trialEarnings, timeWaited)
+x = x0
 
