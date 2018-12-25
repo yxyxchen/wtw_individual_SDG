@@ -84,6 +84,11 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
       # update stepGap
       stepGap = ifelse(trialGoOn, 1, ifelse(action == 'quit', iti / stepDuration, iti / stepDuration + 1))
       
+      # track preQwait and preQquit for debugging 
+      preQquit = Qquit
+      preQwait = Qwait
+      preXs = xs
+      preAction = action
       # update action value of quit and wait
       # here stepGap meatured between At and At+1
       delta = nextReward + gamma^(stepGap) * ifelse(nextAction == 'wait',  Qwait[nextXs], Qquit)-ifelse(action == 'wait', Qwait[xs], Qquit)
@@ -116,6 +121,11 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
         # if quit, quit at t, if wait, wait until t+1
         timeWaited[tIdx] = ifelse(getReward, rewardDelay, ifelse(action == "quit", timeTicks[t], timeTicks[t+1]))
         break
+      }
+      
+      # debug
+      if(sum(Qwait < 0) > 0 || Qquit < 0){
+        browser()
       }
     }  # one trial end
   } # simulation end
