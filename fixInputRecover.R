@@ -39,7 +39,7 @@ for(condIdx in 1 : 2){
   thisNegLLs = vector(length = nComb)
   thisSolutions = matrix(NA, nComb, nPara)
   
-  for(combIdx in 1 : nComb){
+  for(combIdx in 37 : nComb){
     wIni = wInis[[cond]]
     para = initialSpace[combIdx, ]
     timeWaited = rawData$timeWaited[combIdx, 1, 1 : nTrials ]

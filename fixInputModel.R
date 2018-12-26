@@ -78,8 +78,8 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
       # here stepGap meatured between At and At-1
       junk = rep(0, nTimeStep)
       junk[xs] = 1
-      eWait =  gamma^stepGap * lambda * eWait + junk * c(action == "wait")
-      eQuit = gamma ^stepGap * lambda * eQuit + c(action == "quit") 
+      eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), rep(0, length = nTimeStep))
+      eQuit = min(gamma ^stepGap * lambda * eQuit + c(action == "quit"), 1)
       
       # update stepGap
       stepGap = ifelse(trialGoOn, 1, ifelse(action == 'quit', iti / stepDuration, iti / stepDuration + 1))

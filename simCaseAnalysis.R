@@ -6,10 +6,10 @@ library('ggplot2')
 source('subFxs/plotThemes.R')
 source('subFxs/wtwSettings.R')
 source("subFxs/actionValueViewer.R")
-load('outputs/QStarData/colpData.RData')
-load('outputs/QStarData/initialSpace.RData')
-load('outputs/QStarData/RawHPData.RData')
-load('outputs/QStarData/RawLPData.RData')
+load('outputs/simData/colpData.RData')
+load('outputs/simData/initialSpace.RData')
+load('outputs/simData/RawHPData.RData')
+load('outputs/simData/RawLPData.RData')
 
 ###### choose condition ########3
 condIdx = 2
@@ -23,7 +23,7 @@ trialTick = trialTicks[[condIdx]] # so here if use [2] then get a list
 
 ####### view simulation data case by case ##########
 # choose cases you want to plot
-nCombList = which(inputColp$AUC < 6 && inputColp$AUC < 3) 
+nCombList = which(inputColp$AUC < 3) 
 # choose figrues you want to plot
 plotTrialData = T
 plotKMSC= T

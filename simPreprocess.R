@@ -6,7 +6,6 @@
 ############# load data and functions ######
 load('outputs/simData/rawHPData.RData')
 load('outputs/simData/rawLPData.RData')
-load('outputs/simData/hdrData.RData')
 library("dplyr")
 library("tidyr")
 source('subFxs/plotThemes.R')
