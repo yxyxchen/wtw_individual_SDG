@@ -1,6 +1,6 @@
 # add number of repeation
 fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
-  # set.seed(123)
+  set.seed(123)
   phi = para[1]
   tau = para[2]
   gamma = para[3]
@@ -46,7 +46,7 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
   action = ifelse(runif(1) < waitRate, 'wait', 'quit')
   
   # loop until time runs out
-  for(tIdx in 1 : nTrial) {
+  for(tIdx in 1 : 8) {
     # sample rewardDelay
     rewardDelay = rewardDelays[tIdx]
     # no time limiting 
@@ -78,7 +78,7 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
       # here stepGap meatured between At and At-1
       junk = rep(0, nTimeStep)
       junk[xs] = 1
-      eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), rep(0, length = nTimeStep))
+      eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), rep(1, length = nTimeStep))
       eQuit = min(gamma ^stepGap * lambda * eQuit + c(action == "quit"), 1)
       
       # update stepGap
@@ -123,10 +123,6 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
         break
       }
       
-      # debug
-      if(sum(Qwait < 0) > 0 || Qquit < 0){
-        browser()
-      }
     }  # one trial end
   } # simulation end
   outputs = list("Qwait" = Qwait,

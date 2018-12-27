@@ -51,7 +51,7 @@ negLLAction  = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
       # update eWait and eQuit
       junk = rep(0, nTimeStep)
       junk[t] = 1
-      eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), 1)
+      eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), rep(1, nTimeStep))
       eQuit = min(gamma ^stepGap * lambda * eQuit + c(action == "quit"), 1)
       
       # update Qwait and Qquit

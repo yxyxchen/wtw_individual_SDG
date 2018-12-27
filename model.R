@@ -86,7 +86,7 @@ simulationModel = function(para, otherPara, cond, wIni){
           # here stepGap meatured between At and At-1
           junk = rep(0, nTimeStep)
           junk[xs] = 1
-          eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), rep(0, length = nTimeStep))
+          eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), rep(1, length = nTimeStep))
           eQuit = min(gamma ^stepGap * lambda * eQuit + c(action == "quit"), 1)
           
           # update stepGap

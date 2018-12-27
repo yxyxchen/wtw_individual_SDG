@@ -15,7 +15,6 @@ load('outputs/simData/initialSpace.RData')
 # load simulation data 
 load('outputs/simData/colpData.RData')
 load('outputs/simData/rawWTW.RData')
-load('outputs/simData/hdrData.RData')
 
 # define output file
 outFile = 'outputs/sim_figures'

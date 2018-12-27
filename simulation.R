@@ -13,7 +13,7 @@ source('subFxs/wtwSettings.R') # wtw settings for both HP and LP
                         # can't change
 source('subFxs/paraFxs.R') # functions to get MSPara and otherPara from inputs and wtwSettings
                     # can change for different MS model, and 
-
+stepDuration = 0.5
 ############# generate the parameter search space ##########
 nPara = 3
 paraNames = c('phi', 'tau', 'gamma')

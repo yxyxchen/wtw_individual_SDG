@@ -23,7 +23,7 @@ trialTick = trialTicks[[condIdx]] # so here if use [2] then get a list
 
 ####### view simulation data case by case ##########
 # choose cases you want to plot
-nCombList = which(inputColp$AUC < 3) 
+nCombList = which(inputColp$AUC > 25) 
 # choose figrues you want to plot
 plotTrialData = T
 plotKMSC= T
@@ -144,11 +144,16 @@ for(nCb in 1 : length(nCombList)){
     trialPlots(thisTrialData,label)
   }
   
+  if( plotTrialData){
+    readline(prompt = paste(nCb, '(hit ENTER to continue)'))
+  }
   # survival analysis
   if(plotKMSC){
     kmscResults = kmsc(thisTrialData,tMax,label,plotKMSC,kmGrid)
   }
-
+  if(plotKMSC){
+    readline(prompt = paste(nCb, '(hit ENTER to continue)'))
+  }
   
   # plot wait time distribution based on survival analysis
   if(drawTimeSample){
