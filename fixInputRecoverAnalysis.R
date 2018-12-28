@@ -5,6 +5,10 @@ load('outputs/simData/initialSpace.RData')
 load('outputs/fixInputSimData/actionRecover.RData')
 load('outputs/fixInputSimData/colpData.RData')
 
+# 
+hist(negLLs$HP) 
+hist(negLLs$LP) 
+
 # plot actionRecover
 plotData = data.frame(c(negLLs$HP, negLLs$LP), rbind(solutions$HP, solutions$LP),
                       rbind(initialSpace, initialSpace),
@@ -26,8 +30,8 @@ ggplot(plotData, aes(gamma, gammaHat)) + geom_boxplot() + facet_grid(.~cond) +
   geom_point() + saveTheme 
 ggsave('outputs/fixInputSim_figures/actionRecover_gamma.pdf',width = 8, height = 3)
 
-# 
-hist(negLLs$HP) 
-hist(negLLs$LP) 
+#
+ggplot()
+
 
 
