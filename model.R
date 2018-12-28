@@ -28,7 +28,7 @@ simulationModel = function(para, otherPara, cond, wIni){
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, blockSecs / iti + 1);
   vaWaits[,1] = wIni;
-  vaQuits = vactor(length = blockSecs / iti + 1);
+  vaQuits = vector(length = blockSecs / iti + 1);
   vaQuits[1] = wIni* gamma ^(iti / stepDuration);
   
   # initialize time and reward seq
@@ -112,7 +112,7 @@ simulationModel = function(para, otherPara, cond, wIni){
       browser()
     }
   } # simulation end
-  outputs = list("Qwait" = Qwait,
+  outputs = list(
                  "trialEarnings" = trialEarnings,
                  "timeWaited" = timeWaited,
                  "rewardDelays" = rewardDelays,
@@ -270,7 +270,7 @@ fictiveModel = function(para, otherPara, cond, wIni){
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, blockSecs / iti + 1);
   vaWaits[,1] = wIni;
-  vaQuits = matrix(NA, nTimeStep, blockSecs / iti + 1);
+  vaQuits = vector(NA, nTimeStep, blockSecs / iti + 1);
   vaQuits[1,1] = wIni* gamma ^(iti / stepDuration);
   
   # initialize time and reward seq

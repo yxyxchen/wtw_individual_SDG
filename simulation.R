@@ -73,9 +73,8 @@ for(condIdx in 1 : 2){
   tMax = otherPara[['tMax']]
   TrialEarnings = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
   RewardDelays = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
-  Qwait = array(dim = c(nValue^nPara, nRep, tMax / stepDuration)) # diifferent from master
   TimeWaited = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
-  vaQuits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, blockSecs / iti + 1))
+  vaQuits = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
   vaWaits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, blockSecs / iti + 1))
   
   for(h in 1 : nrow(initialSpace)){
@@ -84,17 +83,16 @@ for(condIdx in 1 : 2){
     for(j in 1 : nRep ){
       tempt=  simulationModel(para,otherPara, cond, wIni)
       TrialEarnings[h, j,] = tempt[['trialEarnings']]
-      Qwait[h, j,] = tempt[['Qwait']]
       RewardDelays[h, j,] = tempt[['rewardDelays']]
       TimeWaited[h, j, ] = tempt[['timeWaited']]
-      vaQuits[h, j,  , ] = tempt[['vaQuits']]
+      vaQuits[h, j, ] = tempt[['vaQuits']]
       vaWaits[h, j, ,  ] = tempt[['vaWaits']]
       thisPackData[[count[h, j]]] = tempt
     }  
   }
   
   # organize and save outputs 
-  outputData = list("Qwait" = Qwait, "timeWaited" = TimeWaited,
+  outputData = list("timeWaited" = TimeWaited,
                     "rewardDelays" = RewardDelays, "trialEarnings" = TrialEarnings,
                     "vaWaits" = vaWaits, "vaQuits" = vaQuits
   )
@@ -117,4 +115,5 @@ for(condIdx in 1 : 2){
     save(packLPData,file = fileName)
   }
 }
+
 

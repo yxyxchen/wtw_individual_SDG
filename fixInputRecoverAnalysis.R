@@ -5,9 +5,14 @@ load('outputs/simData/initialSpace.RData')
 load('outputs/fixInputSimData/actionRecover.RData')
 load('outputs/fixInputSimData/colpData.RData')
 
+dir.create('outputs/fixInputSim_figures')
+
 # 
-hist(negLLs$HP) 
-hist(negLLs$LP) 
+plotData = data.frame(negLL = c(negLLs$HP, negLLs$LP),
+                      condition = rep(c('HP', 'LP'), each = length(negLLs$HP)))
+ggplot(plotData, aes(negLL, fill = condition)) + geom_histogram(bins = 10) +
+  facet_grid(.~condition) + scale_fill_manual(values = conditionColors) + saveTheme
+ggsave('outputs/fixInputSim_figures/negLL.pdf')
 
 # plot actionRecover
 plotData = data.frame(c(negLLs$HP, negLLs$LP), rbind(solutions$HP, solutions$LP),
@@ -20,18 +25,15 @@ plotData$tau = factor(plotData$tau)
 plotData$gamma = factor(plotData$gamma)
 ggplot(plotData, aes(phi, phiHat)) + geom_boxplot() + facet_grid(.~cond) +
   geom_point() + saveTheme 
-ggsave('outputs/fixInputSim_figures/actionRecover_phi.pdf', width = 8, height = 3)
+ggsave('outputs/fixInputSim_figures/phi_phiHat.pdf', width = 8, height = 3)
 
 ggplot(plotData, aes(tau, tauHat)) + geom_boxplot() + facet_grid(.~cond) +
   geom_point() + saveTheme 
-ggsave('outputs/fixInputSim_figures/actionRecover_tau.pdf', width = 8, height = 3)
+ggsave('outputs/fixInputSim_figures/tau_tauHat.pdf', width = 8, height = 3)
 
 ggplot(plotData, aes(gamma, gammaHat)) + geom_boxplot() + facet_grid(.~cond) +
   geom_point() + saveTheme 
-ggsave('outputs/fixInputSim_figures/actionRecover_gamma.pdf',width = 8, height = 3)
-
-#
-ggplot()
+ggsave('outputs/fixInputSim_figures/gamma_gammaHat.pdf',width = 8, height = 3)
 
 
 

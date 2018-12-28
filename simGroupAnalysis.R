@@ -137,12 +137,5 @@ fileName = file.path(outFile, "HPAUC_LPAUC.pdf")
 ggsave(fileName, width = 8, height = 8)
 
 
-########### look at raw data ##############
-linearData = as.data.frame(initialSpace);
-colnames(linearData) = c('phi', 'tau', 'gamma', 'lambda', 'wIni')
-linearData$AUC = colpHPData$AUC
-summarise(group_by(linearData, phi), mu = mean(wIni))
-fit = lm(AUC ~ phi + tau + wIni + gamma + lambda, data = linearData)
-summary(fit)
-
-plot()
+# relationship betweem 
+#################

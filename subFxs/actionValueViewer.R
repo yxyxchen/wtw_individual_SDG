@@ -2,31 +2,14 @@
 # set them identical with the last updated value
 actionValueViewer = function(vaWaits, vaQuits, blockData, para){
   
-  gamma = para[3];
-  nTimeStep = nrow(vaQuits);
-  
-  # if vaWaits is not updated, then just take the value of the last trial
-  for(i in 2 : endTick){
-    if(sum(is.na(vaWaits[,i])) > 0){
-      vaWaits[is.na(vaWaits[,i]),i]  = vaWaits[is.na(vaWaits[,i]),i-1] 
-    }
-  }
-  
-  # if vaQuit is not recorded, it is equal the next recording 
-  for(i in 1 : endTick){
-    if(sum(is.na(vaQuits[,i])) > 0){
-      vaQuits[is.na(vaQuits[,i]),i] = vaQuits[match(NA,vaQuits[,i] ) - 1,i]
-    }
-  }
-  
-  # 
+
   endTick =  length(blockData$trialEarnings)
-  nTimeStep = dim(vaQuits)[1]
+  nTimeStep = dim(vaWaits)[1]
   stepDuration = 0.5
   
   for(i in 1: endTick){
     cIdx = i
-    plotData = data.frame(va =c(vaWaits[,cIdx], vaQuits[,cIdx]),
+    plotData = data.frame(va =c(vaWaits[,cIdx], rep(vaQuits[cIdx], nTimeStep)),
                           time = rep( 1 : nTimeStep, 2),
                           action = rep(c('wait', 'quit'),
                                        each = nTimeStep))
