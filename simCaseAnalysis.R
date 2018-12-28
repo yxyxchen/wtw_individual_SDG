@@ -24,11 +24,12 @@ trialTick = trialTicks[[condIdx]] # so here if use [2] then get a list
 ####### view simulation data case by case ##########
 # choose cases you want to plot
 nCombList = which(initialSpace[,2] == 22)
+nCombList = 1 : 125
 # choose figrues you want to plot
 plotTrialData = T
-plotKMSC= F
+plotKMSC= T
 drawTimeSample = F
-plotActionValue = T
+plotActionValue = F
 # plot
 for (nCb in 1 : length(nCombList)){
   i = nCombList[nCb]
@@ -38,7 +39,7 @@ for (nCb in 1 : length(nCombList)){
   totalEarnings = inputColp$totalEarnings[i]
   wtw = inputColp$wtw[i]
   AUC = inputColp$AUC[i]
-  label = sprintf('%.1f, %d, %.1f, colp stat, earn: %d, AUC: %.2f',
+  label = sprintf('%.2f, %d, %.2f, colp stat, earn: %d, AUC: %.2f',
                   initialSpace[i, 1],initialSpace[i, 2],initialSpace[i, 3],
                   totalEarnings, AUC)
   # block data
@@ -109,6 +110,7 @@ for (nCb in 1 : length(nCombList)){
   
   if(plotActionValue) {
     readline(prompt = paste(nCb, '(hit ENTER to continue)'))
+    graphics.off()
   }
   
 }

@@ -32,7 +32,8 @@ negLLAction  = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
     if(trialEarnings[tIdx] > 0){
       nTimePoint = ceiling(waitDuration / stepDuration)
     }else{
-      nTimePoint = ceiling(waitDuration / stepDuration) + 1
+      # after the discretation, still didn't get rewards
+      nTimePoint = floor(waitDuration / stepDuration) + 1
     }
     # loop over time points 
     
@@ -42,6 +43,9 @@ negLLAction  = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
         LL = LL + tau* Qquit - log(sum(exp(tau * Qwait[t]) + exp(tau * Qquit)))
       }else{
         LL = LL + tau* Qwait[t] - log(sum(exp(tau * Qwait[t]) + exp(tau * Qquit)))
+      }
+      if(is.na(LL)){
+        browser()
       }
     }
     # update Qwait and Qquit 

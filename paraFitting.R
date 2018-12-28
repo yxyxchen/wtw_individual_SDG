@@ -36,39 +36,51 @@ for(sIdx in 1 : n){
   thisID = allIDs[sIdx]
   thisTrialData = trialData[[thisID]]
   thisTrialData = thisTrialData[thisTrialData$blockNum ==1,]
+  
   # prepare data for para fitting
-  thisCond = unique(thisTrialData$condition)
-  otherPara = getOtherPara(thisCond, stepDuration)
-  wIni = wInis[[thisCond]]
-  thisRewardDelays = thisTrialData$scheduledWait
-  thisTimeWaited = thisTrialData$timeWaited
-  thisTrialEarn = thisTrialData$trialEarnings
+  cond = unique(thisTrialData$condition)
+  otherPara = getOtherPara(cond, stepDuration)
+  wIni = wInis[[cond]]
+  rewardDelays = thisTrialData$scheduledWait
+  timeWaited = thisTrialData$timeWaited
+  trialEarnings = thisTrialData$trialEarnings
   # since the real waiting time is recorded, however, waiting longer than the reward didn't make sense
-  thisTimeWaited[thisTrialEarn == tokenValue] = thisRewardDelays[thisTrialEarn == tokenValue] 
+  timeWaited[trialEarnings == tokenValue] = rewardDelays[trialEarnings == tokenValue] 
+  # truncate the last trial
+  trialEarnings = trialEarnings[1 : (length(trialEarnings) - 1)]
+  timeWaited = timeWaited[1 : (length(timeWaited) - 1)]
   
   # para fitting
   LL = 1e5
   solution = vector(length = nPara)
   for(s in 1 : nrow(startPoints)){
     x0 = startPoints[s, ]
-    local_optimizer = list(algorithm = "NLOPT_GN_MLSL_LDS", maxeval = 1e6)
-    opts = list(algorithm = "NLOPT_LN_BOBYQA", stopval = 5,
+    local_optimizer = list(algorithm = "NLOPT_GN_MLSL_LDS", maxeval = 1e4)
+    opts = list(algorithm = "NLOPT_LN_BOBYQA", stopval = 10,
                 local_optimizer = local_optimizer) 
     
-    res = nloptr(x0 = x0, eval_f = eval_f_wait, lb = c(0, 0, 0) , ub = c(1, Inf, 1),
+    res = nloptr(x0 = x0, eval_f = negLLAction, lb = c(0, 1, 0) , ub = c(1, 22, 1),
                  opts = opts,
-                 otherPara = otherPara, cond = thisCond, wIni = wIni,
-                 rewardDelays = thisRewardDelays, trueTimeWaited = thisTimeWaited)
+                 otherPara = otherPara, cond = cond, wIni = wIni,
+                 trialEarnings = trialEarnings , timeWaited =  timeWaited)
+    
     if(res$objective < LL){
       LL = res$objective
       solution = res$solution
     }
   }# end of loop across starting points
+  if( (sIdx %% 20) == 0){
+    txt = sprintf('complete %s', percent(sIdx / nComb))
+    print(txt)
+  }
   LLs[sIdx] = LL
   solutions[sIdx,] = solution
 }
 save('LLs', 'solutions', file = 'outputs/expData/waitRecover.RData')
 
-
-
+x = x0
+cond = cond
+trialEarnings = trialEarnings
+timeWaited = timeWaited
+negLLAction(x0, otherPara, thisCond, wIni, thisTrialEarn, thisTimeWaited)
 

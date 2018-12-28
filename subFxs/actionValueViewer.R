@@ -27,6 +27,10 @@ actionValueViewer = function(vaWaits, vaQuits, blockData, para){
       geom_vline(xintercept = endStep) + xlim(c(-1, nTimeStep)) +
       ggtitle(label) + xlab('time step') + ylab('action value') + displayTheme
     print(p)
-    readline(prompt = paste(i, '(hit ENTER for action valus in the next trial)'))
+    
+    input = readline(prompt = paste(i, '(ENTER to continue, Q to quit)'))
+    if(input == 'Q'){
+      break
+    }
   }  
 }
