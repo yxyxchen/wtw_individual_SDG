@@ -22,7 +22,7 @@ cat('Analyzing data for n','=',n,'subjects.\n')
 
 # 
 # control which individual-level plots to generate
-plotTrialwiseData = F
+plotTrialwiseData = T
 plotKMSC = F
 plotWTW = F
 plotTimeEarnings = F
@@ -42,7 +42,7 @@ cumEarn = matrix(NA, length(tGrid), n * nBlock)
 for(sIdx in 1 : n){
   thisID = allIDs[sIdx]
   thisTrialData = trialData[[thisID]]
-  unique(thisTrialData$condition)
+  condition = unique(thisTrialData$condition)
   thisTrialData = thisTrialData[thisTrialData$blockNum == 2, ]
   thisRT = thisTrialData$timeWaited - thisTrialData$rewardTime;
   thisRewardDelays = thisTrialData$scheduledWait
@@ -65,7 +65,7 @@ for (sIdx in 1:n) {
     noIdx = (sIdx - 1) * nBlock + bkIdx
       
     # 
-    tMax = ifelse(thisCond == conditionNames[1], tMaxs[1], tMaxs[2])
+    tMax = ifelse(thisCond == condition[1], tMaxs[1], tMaxs[2])
     kmGrid = seq(0, tMax, by=0.1) # grid on which to average survival curves.
 
     #  summarise blockwise conditions and response functions
