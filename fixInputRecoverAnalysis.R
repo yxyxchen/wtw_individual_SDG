@@ -27,7 +27,7 @@ ggplot(plotData, aes(gamma, gammaHat)) + geom_boxplot() + facet_grid(.~cond) +
 ggsave('outputs/fixInputSim_figures/actionRecover_gamma.pdf',width = 8, height = 3)
 
 # 
-hist(negLLs$HP - colpHPData$waitWithinDelta ^ 2) 
-hist(negLLs$LP - colpLPData$waitWithinDelta ^ 2) 
+hist(negLLs$HP) 
+hist(negLLs$LP) 
 
 

@@ -28,8 +28,8 @@ simulationModel = function(para, otherPara, cond, wIni){
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, blockSecs / iti + 1);
   vaWaits[,1] = wIni;
-  vaQuits = matrix(NA, nTimeStep, blockSecs / iti + 1);
-  vaQuits[1,1] = wIni* gamma ^(iti / stepDuration);
+  vaQuits = vactor(length = blockSecs / iti + 1);
+  vaQuits[1] = wIni* gamma ^(iti / stepDuration);
   
   # initialize time and reward seq
   totalSecs = 0
@@ -100,13 +100,13 @@ simulationModel = function(para, otherPara, cond, wIni){
             phi * trialReward * gamma ^ rev((1 : (t - 1 )))
         }
       }
+      # track vaWaits and vaQuits 
+      vaWaits[,tIdx + 1] = Qwait
+      vaQuits[tIdx + 1] = Qquit
     }
     
     # go to the next trial 
     tIdx = tIdx + 1
-    # track vaWaits and vaQuits 
-    vaWaits[,tIdx + 1] = Qwait
-    vaQuits[tIdx] = Qquit
     
     if(Qquit < 0 || sum(Qwait < 0) > 0){
       browser()

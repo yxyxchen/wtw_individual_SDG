@@ -23,52 +23,42 @@ negLLAction  = function(x, otherPara, cond, wIni, trialEarnings, timeWaited){
   # initialize action values, eligibility traces and lik
   Qwait = rep(wIni, nTimeStep) 
   Qquit = wIni * gamma ^(iti / stepDuration)
-  eWait = rep(0, nTimeStep); # es vector for "wait"
-  eQuit = 0; # es vector for "quit"
   LL = 0
   
-  # loop over trials and skip the last trial
-  for(tIdx in 1 : (nTrial - 1)){
-    t = 1
-    nTimePoint = getNTimePoint(trialEarnings[tIdx],
-                               timeWaited[tIdx], stepDuration)
+  # need to skip 
+  for(tIdx in 1 : nTrial){
+    # determine nTimePoint
+    waitDuration = timeWaited[tIdx]
+    if(trialEarnings[tIdx] > 0){
+      nTimePoint = ceiling(waitDuration / stepDuration)
+    }else{
+      nTimePoint = ceiling(waitDuration / stepDuration) + 1
+    }
     # loop over time points 
-    while(t <= nTimePoint){
+    
+    for(t in 1 : nTimePoint){
       # update lik
-      if(tau* Qwait[t] - log(sum(exp(tau * Qwait[t]) + exp(tau * Qquit))) > 0){
-        browser()
-      }
-      LL = LL + tau* Qwait[t] - log(sum(exp(tau * Qwait[t]) + exp(tau * Qquit)))
-      
-      # determine action, nextReward, stepGap, nextT, nextAction
-      action = getAction(trialEarnings[tIdx], t, nTimePoint)
-      nextReward = getNextReward(trialEarnings[tIdx], t, nTimePoint)
-      stepGap = getStepGap(trialEarnings[tIdx], t, nTimePoint, stepDuration)
-      actionNextTrial = ifelse(timeWaited[tIdx + 1] > 0, 'wait', 'quit')
-      nextAction = getNextAction(trialEarnings[tIdx], t, nTimePoint, actionNextTrial)
-      nextT = ifelse(t >= nTimePoint, 1, t + 1)
-      
-      # update eWait and eQuit
-      junk = rep(0, nTimeStep)
-      junk[t] = 1
-      eWait =  pmin(gamma^stepGap * lambda * eWait + junk * c(action == "wait"), rep(1, nTimeStep))
-      eQuit = min(gamma ^stepGap * lambda * eQuit + c(action == "quit"), 1)
-      
-      # update Qwait and Qquit
-      delta = nextReward +
-        gamma^(stepGap) * ifelse(nextAction == 'wait',  Qwait[nextT], Qquit)-
-        ifelse(action == 'wait', Qwait[t], Qquit)
-      Qwait = Qwait + phi * delta * eWait
-      Qquit = Qquit + phi * delta * eQuit
-      
-      # update T
-      if(nextT == 1){
-        break
+      if(trialEarnings[tIdx] == 0 & t == nTimePoint){
+        LL = LL + tau* Qquit - log(sum(exp(tau * Qwait[t]) + exp(tau * Qquit)))
       }else{
-        t = nextT
+        LL = LL + tau* Qwait[t] - log(sum(exp(tau * Qwait[t]) + exp(tau * Qquit)))
+      }
+    }
+    # update Qwait and Qquit 
+    if(trialEarnings[tIdx] > 0){
+      trialReward = tokenValue
+      Qwait[1 : t] = (1 - phi) * Qwait[1 : t] + phi * trialReward * gamma ^ rev((0 : (t - 1 )))
+    }else{
+      nextWaitRateHat =  1 / sum(1  + exp((Qquit - Qwait[1])* tau))
+      trialReward = nextWaitRateHat * Qwait[1] * gamma ^(iti / stepDuration) +
+        (1 - nextWaitRateHat) * Qquit * gamma ^(iti / stepDuration)
+      
+      Qquit =  (1 - phi) * Qquit + phi *  trialReward
+      if(t > 1){
+        Qwait[1 : (t - 1)] = (1 - phi) * Qwait[1 : (t - 1)] +
+          phi * trialReward * gamma ^ rev((1 : (t - 1 )))
       }
       
-
     }# end of one trial
   }# end of all trials
   negLL = -LL

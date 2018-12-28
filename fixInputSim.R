@@ -49,7 +49,7 @@ for(cIdx in 1 : 2){
   # initialize outputs
   TrialEarnings = array(dim = c(nValue^nPara, nRep, nTrials))
   TimeWaited = array(dim = c(nValue^nPara, nRep, nTrials))
-  vaQuits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, nTrials))
+  vaQuits = array(dim = c(nValue^nPara, nRep, nTrials))
   vaWaits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, nTrials))
   dvs = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, nTrials)) # decision value, Qwait - Qquit, scaled within trials
   # simulate for every para
@@ -61,12 +61,10 @@ for(cIdx in 1 : 2){
       TrialEarnings[i, j, ] = junk[1 : nTrials]
       junk =  tempt[['timeWaited']]
       TimeWaited[i, j, ] = junk[1 : nTrials]
-      junk = tempt[['vaQuits']]
-      vaQuits[i, j,  , ] = transVaQuits(junk[, 1 : nTrials])
-      junk = tempt[['vaWaits']]
-      vaWaits[i, j, ,  ]  = transVaWaits(junk[, 1 : nTrials])
+      vaQuits[i, j,  ] = tempt[['vaQuits']]
+      vaWaits[i, j, ,  ]  = tempt[['vaWaits']]
       # decision value
-      junk = vaWaits[i, j, ,  ] - vaQuits[i, j, ,  ]
+      junk = vaWaits[i, j, ,  ] - vaQuits[i, j, ]
       dvs[i, j, , ] = junk
     }
   }

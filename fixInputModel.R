@@ -23,14 +23,12 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
   # exp(-r * stepDuration) = gamma
   Qwait = rep(wIni, nTimeStep) # Q(si, ai = wait), any i
   Qquit = wIni * gamma ^(iti / stepDuration)
-  eWait = rep(0, nTimeStep); # es vector for "wait"
-  eQuit = 0; # es vector for "quit"
   
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, nTrial);
   vaWaits[,1] = wIni;
-  vaQuits = matrix(NA, nTimeStep, nTrial);
-  vaQuits[1,1] = wIni* gamma ^(iti / stepDuration);
+  vaQuits = vector(length = nTrial);
+  vaQuits[1] = wIni* gamma ^(iti / stepDuration);
   
   # initialize outputs 
   trialEarnings = rep(0, nTrial)
@@ -43,11 +41,10 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
     rewardDelay = rewardDelays[tIdx]
     # calculaye available time steps
     # since we use floor there maybe 0.5 sec error (less than 90 s)
-    nAvaStep = min(floor((blockSecs - totalSecs) / stepDuration), nTimeStep)
     
     # loop until available steps run out 
     t = 1
-    while(t <= nAvaStep){
+    while(t <= nTimeStep){
       # action
       waitRate =  1 / sum(1  + exp((Qquit - Qwait[t])* tau))
       action = ifelse(runif(1) < waitRate, 'wait', 'quit')
@@ -58,7 +55,7 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
       
       # dertime next state
       # go to the terminate state if at the final step or quit or reward arrives
-      trialGoOn= (action == 'wait' && !rewardOccur && t < nAvaStep)
+      trialGoOn= (action == 'wait' && !rewardOccur && t < nTimeStep)
       
       # if the trial stops, track trialEarnings, timeWaited and rewardDelays
       # otherwise, continue
@@ -93,17 +90,15 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
             phi * trialReward * gamma ^ rev((1 : (t - 1 )))
         }
       }
+      # track vaWaits and vaQuits 
+      vaWaits[,tIdx + 1] = Qwait
+      vaQuits[tIdx + 1] = Qquit
     }
     
     # go to the next trial 
     tIdx = tIdx + 1
-    # track vaWaits and vaQuits 
-    vaWaits[,tIdx + 1] = Qwait
-    vaQuits[tIdx] = Qquit
     
-    if(Qquit < 0 || sum(Qwait < 0) > 0){
-      browser()
-    }
+    
   } # simulation end
   outputs = list(
                  "trialEarnings" = trialEarnings,

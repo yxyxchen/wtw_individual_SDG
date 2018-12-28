@@ -10,7 +10,7 @@ source('subFxs/wtwSettings.R')
 source('subFxs/paraFxs.R') 
 source('subFxs/taskFxs.R')
 source('eval_f.R')
-source('subFxs/negLogHelperFxs.R')
+library('scales')
 load('outputs/fixInputSimData/fixInputs.RData')# load rewardDelays
 
 # need know the true parameter and true outputs
@@ -39,7 +39,7 @@ for(condIdx in 1 : 2){
   thisNegLLs = vector(length = nComb)
   thisSolutions = matrix(NA, nComb, nPara)
   
-  for(combIdx in 37 : nComb){
+  for(combIdx in 1 : nComb){
     wIni = wInis[[cond]]
     para = initialSpace[combIdx, ]
     timeWaited = rawData$timeWaited[combIdx, 1, 1 : nTrials ]
@@ -62,10 +62,14 @@ for(condIdx in 1 : 2){
         negLL = res$objective
         solution = res$solution
       }
+      if( (combIdx %% 25) == 0){
+        txt = sprintf('complete %s', percent(combIdx / nComb))
+        print(txt)
+      }
     }# end of loop across starting points
     thisNegLLs[combIdx] = negLL
     thisSolutions[combIdx,] = solution
-  }
+  }# end of loop for a para comb
   negLLs[[cond]] = thisNegLLs
   solutions[[cond]] = thisSolutions
   
