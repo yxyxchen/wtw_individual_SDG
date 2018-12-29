@@ -62,11 +62,11 @@ for(condIdx in 1 : 2){
         negLL = res$objective
         solution = res$solution
       }
-      if( (combIdx %% 25) == 0){
-        txt = sprintf('complete %s', percent(combIdx / nComb))
-        print(txt)
-      }
     }# end of loop across starting points
+    if( (combIdx %% 25) == 0){
+      txt = sprintf('complete %s', percent(combIdx / nComb))
+      print(txt)
+    }
     thisNegLLs[combIdx] = negLL
     thisSolutions[combIdx,] = solution
   }# end of loop for a para comb

@@ -115,4 +115,40 @@ optimRewardRates$LP = max(LP)
 #   if(c == 1) HP = actionValueWaits else LP = actionValueWaits
 # }
 
+### calculate action values   
+# suppose waiting to the last seconds
+cond = 'LP'
+thisTrialTicks = trialTicks[[cond]]
+thisRewardDelayPDF = rewardDelayPDF[[cond]]
+nGap =  length(thisTrialTicks) - 1
+
+dv = matrix(NA, nGap, length(gammaList))
+vaWaits = matrix(NA, nGap, length(gammaList))
+vaQuits = matrix(NA, nGap, length(gammaList))
+gammaList = seq(0.75, 0.98, length.out = 3)
+for(h in 1 : length(gammaList)){
+  gamma = gammaList[h]
+  Qwait = vector(length = nGap)
+  for(i in 1 : nGap ){
+    discount = gamma ^ rev(0 : (nGap - i))
+    Qwait[i] = sum(tokenValue * discount * thisRewardDelayPDF[(i + 1) : (nGap + 1)])/
+      sum(thisRewardDelayPDF[(i + 1) : (nGap + 1)])
+  }
+  Qquit = rep(Qwait[1] * gamma ^ 4, nGap)
+  vaWaits[,h] = Qwait
+  vaQuits[,h]= Qquit
+  dv[,h] = Qwait - Qquit
+}
+
+tempt = data.frame(dv = dv, time = (1 : nGap) * 0.1, Qwait = vaWaits, Qquit = vaQuits)
+plotData = data.frame(dv = as.vector(dv), Qwait = as.vector(vaWaits),
+                      Qquit = as.vector(vaQuits), gamma = as.factor(rep(gammaList, each = nGap)),
+                      time = rep(1 : nGap * 0.1, length(gammaList)))
+ggplot(plotData, aes(time, dv, color = gamma)) + geom_line(size = 2) + ylab('Decision variable') + saveTheme+ggtitle(cond) + xlab('Time / s')
+
+plotData2 = gather(plotData, action, actionValue, -c(1,4,5))
+plotData2$action = ifelse(plotData2$action == 'Qwait', 'wait', 'quit')
+ggplot(plotData2, aes(time, actionValue, color = gamma, linetype= action)) + geom_line(size = 2) + saveTheme +ggtitle(cond) +
+  ylab('Action value') + xlab('Time / s')
+
 
