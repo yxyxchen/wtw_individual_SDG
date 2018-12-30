@@ -22,7 +22,7 @@ cat('Analyzing data for n','=',n,'subjects.\n')
 
 # 
 # control which individual-level plots to generate
-plotTrialwiseData = T
+plotTrialwiseData = F
 plotKMSC = F
 plotWTW = F
 plotTimeEarnings = F
