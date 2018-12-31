@@ -1,5 +1,5 @@
 # add number of repeation
-fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
+fixInputModel = function(para, otherPara, cond, wIni, rewardDelays, ratio, steep){
   # set.seed(123)
   phi = para[1]
   tau = para[2]
@@ -21,14 +21,14 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
   ########### simulation repeatedly ############
   # initialize action value, eligibility trace and stat
   # exp(-r * stepDuration) = gamma
-  Qwait = rep(wIni, nTimeStep) # Q(si, ai = wait), any i
-  Qquit = wIni * gamma ^(iti / stepDuration)
+  Qwait = wIni * exp(-steep * (0 : (nTimeStep - 1))) # Q(si, ai = wait), any i
+  Qquit =  Qwait[1] * ratio
   
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, nTrial);
-  vaWaits[,1] = wIni;
+  vaWaits[,1] = Qwait;
   vaQuits = vector(length = nTrial);
-  vaQuits[1] = wIni* gamma ^(iti / stepDuration);
+  vaQuits[1] = Qquit;
   
   # initialize outputs 
   trialEarnings = rep(0, nTrial)
