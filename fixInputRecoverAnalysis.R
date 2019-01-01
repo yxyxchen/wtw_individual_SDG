@@ -2,7 +2,7 @@ library('ggplot2')
 source('subFxs/wtwSettings.R')
 source('subFxs/plotThemes.R')
 load('outputs/simData/initialSpace.RData')
-load('outputs/fixInputSimData/actionRecoverSimple.RData')
+load('outputs/fixInputSimData/actionRecover.RData')
 load('outputs/fixInputSimData/colpData.RData')
 
 dir.create('outputs/fixInputSim_figures')
@@ -37,11 +37,14 @@ ggsave('outputs/fixInputSim_figures/gamma_gammaHat.pdf',width = 8, height = 3)
 
 
 #################### parameter pair
-ggplot(plotData, aes(phiHat, tauHat)) + geom_point() + saveTheme
-ggsave('outputs/fixInputSim_figures/phiHat_tauHat.pdf',width = 4, height = 4)
+ggplot(plotData, aes(phiHat, tauHat)) + geom_point() + saveTheme + facet_grid(~cond) +
+  ylim(c(-0.1, 23)) + xlim(c(-0.1, 1.1))
+ggsave('outputs/fixInputSim_figures/phiHat_tauHat.pdf',width = 8, height = 4) 
 
-ggplot(plotData, aes(phiHat, gammaHat)) + geom_point()+saveTheme
-ggsave('outputs/fixInputSim_figures/phiHat_gammaHat.pdf',width = 4, height = 4)
+ggplot(plotData, aes(phiHat, gammaHat)) + geom_point()+saveTheme + facet_grid(~cond) +
+  ylim(c(-0.1, 1.1)) + xlim(c(-0.1, 1.1))
+ggsave('outputs/fixInputSim_figures/phiHat_gammaHat.pdf',width = 8, height = 4)
 
-ggplot(plotData, aes(tauHat, gammaHat)) + geom_point()+saveTheme
-ggsave('outputs/fixInputSim_figures/tauHat_gammaHat.pdf',width = 4, height = 4)
+ggplot(plotData, aes(tauHat, gammaHat)) + geom_point()+saveTheme + facet_grid(~cond)+
+  ylim(c(-0.1, 1.1)) + xlim(c(-0.1, 23))
+ggsave('outputs/fixInputSim_figures/tauHat_gammaHat.pdf',width = 8, height = 4)
