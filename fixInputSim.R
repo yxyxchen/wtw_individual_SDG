@@ -8,9 +8,6 @@ library('dplyr')
 library('tidyr')
 source('fixInputModel.R')
 
-# load data
-load('outputs/simData/initialSpace.RData')
-
 # output files
 dir.create('outputs/fixInputSimData')
 dir.create('outputs/fixInputSim_figures')
