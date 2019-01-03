@@ -19,7 +19,7 @@ load('outputs/fixInputSimData/rawLPData.RData')
 load('outputs/fixInputSimData/rawHPData.RData')
 ################ initial start points space ############
 startPoints = matrix(NA, 3 ^ 3,3)
-startPoints[,1] = rep(c(0.05, 0.15, 0.35), each = 3 ^ 2)
+startPoints[,1] = rep(c(0.005, 0.015, 0.035), each = 3 ^ 2)
 startPoints[,2] = rep(c(1, 5, 15), each = 3 , 3)
 startPoints[,3] = rep(c(0.75, 0.90, 0.95), 3^2)
 stepDuration = 0.5

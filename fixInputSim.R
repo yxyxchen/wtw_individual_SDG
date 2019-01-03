@@ -39,7 +39,7 @@ paraNames = c('phi', 'tau', 'gamma', 'steep', 'ratio')
 nValue = 5
 nComb = nValue ^ nPara
 initialSpace = matrix(NA, nValue^nPara, nPara)
-initialSpace[,1] = rep(seq(0.1, 0.5, length.out = 5), nValue^(nPara - 1)) # phi
+initialSpace[,1] = rep(seq(0.01, 0.05, length.out = 5), nValue^(nPara - 1)) # phi
 initialSpace[,2] = rep(rep(seq(2, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
 initialSpace[,3] = rep(seq(0.8, 0.98, length.out = 5), each = nValue^2)
 
