@@ -1,13 +1,13 @@
 ######### load recover results and auc results #######
 load('outputs/expData/groupData.RData')
-load('outputs/expData/waitRecover.RData')
+load('outputs/expData/actionRecover.RData')
 source('subFxs/wtwSettings.R')
 source('subFxs/plotThemes.R')
 
 ############ prepare dataset #######
-junkData = data.frame(groupData, rep(LLs, 3), rep(solutions[,1], each = 3), rep(solutions[,2], each = 3), rep(solutions[,3], each = 3))
+junkData = data.frame(groupData, rep(negLLs, 3), rep(solutions[,1], each = 3), rep(solutions[,2], each = 3), rep(solutions[,3], each = 3))
 colnames(junkData) = c("id", "blockNum", "cbal", "condition", "stress", "AUC", "totalEarnings",
-                       'LL', 'phi', 'tau', 'gamma')
+                       'negLL', 'phi', 'tau', 'gamma')
 junkData$blockNum = as.factor(junkData$blockNum)
 
 ############ info of fitting ########
@@ -23,7 +23,7 @@ ggplot(junkData,aes(gamma, fill = condition)) + geom_histogram(bins = 30) + face
   scale_fill_manual(values = conditionColors) + saveTheme 
 ggsave('outputs/exp_figures/gamma.pdf', width = 6, height = 3)
 
-ggplot(junkData,aes(LL, fill = condition)) + geom_histogram(bins = 30) + facet_grid(~condition) +
+ggplot(junkData,aes(negLL, fill = condition)) + geom_histogram(bins = 30) + facet_grid(~condition) +
   scale_fill_manual(values = conditionColors) + saveTheme 
 ggsave('outputs/exp_figures/LL.pdf', width = 6, height = 3)
 ############ plot relationship between learning paras and auc ###########

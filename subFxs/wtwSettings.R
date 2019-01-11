@@ -13,7 +13,7 @@ tGrid = seq(0, blockSecs, 0.1)
 
 ######### reward variable ########
 tokenValue = 10 #value of the token
-
+stepDuration = 0.5
 ########## supporting vairbales ########
 # time ticks within a trial for timeEarnings or wtw analysis
 trialTicks = list(
