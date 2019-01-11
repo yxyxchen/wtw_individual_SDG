@@ -6,10 +6,10 @@ load('outputs/fixInputSimData/actionRecoverSmallPhiNI.RData')
 load('outputs/fixInputSimData/colpData.RData')
 dir.create('outputs/fixInputSim_figures')
 
-initialSpace = matrix(NA, nValue^nPara, nPara)
-initialSpace[,1] = rep(seq(0.1, 0.5, length.out = 5), nValue^(nPara - 1)) # phi
-initialSpace[,2] = rep(rep(seq(2, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
-initialSpace[,3] = rep(seq(0.8, 0.98, length.out = 5), each = nValue^2)
+# initialSpace = matrix(NA, nValue^nPara, nPara)
+# initialSpace[,1] = rep(seq(0.1, 0.5, length.out = 5), nValue^(nPara - 1)) # phi
+# initialSpace[,2] = rep(rep(seq(2, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
+# initialSpace[,3] = rep(seq(0.8, 0.98, length.out = 5), each = nValue^2)
 # 
 plotData = data.frame(negLL = c(negLLs$HP, negLLs$LP),
                       condition = rep(c('HP', 'LP'), each = length(negLLs$HP)))
@@ -41,7 +41,7 @@ ggsave('outputs/fixInputSim_figures/gamma_gammaHat.pdf',width = 8, height = 3)
 
 #################### parameter pair
 ggplot(plotData, aes(phiHat, tauHat)) + geom_point() + saveTheme + facet_grid(~cond) +
-  ylim(c(-0.1, 23)) + xlim(c(-0.1, 1.1))
+  ylim(c(-0.1, 31)) + xlim(c(-0.1, 1.1))
 ggsave('outputs/fixInputSim_figures/phiHat_tauHat.pdf',width = 8, height = 4) 
 
 ggplot(plotData, aes(phiHat, gammaHat)) + geom_point()+saveTheme + facet_grid(~cond) +
@@ -49,5 +49,5 @@ ggplot(plotData, aes(phiHat, gammaHat)) + geom_point()+saveTheme + facet_grid(~c
 ggsave('outputs/fixInputSim_figures/phiHat_gammaHat.pdf',width = 8, height = 4)
 
 ggplot(plotData, aes(tauHat, gammaHat)) + geom_point()+saveTheme + facet_grid(~cond)+
-  ylim(c(-0.1, 1.1)) + xlim(c(-0.1, 23))
+  ylim(c(-0.1, 1.1)) + xlim(c(-0.1, 31))
 ggsave('outputs/fixInputSim_figures/tauHat_gammaHat.pdf',width = 8, height = 4)

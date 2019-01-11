@@ -4,8 +4,8 @@ singleFitting = function(combIdx, cond, wIni, trialEarnings, timeWaited, startPo
   solution = vector(length = nPara)
   for(sIdx  in 1 : nrow(startPoints)){
     x0 = startPoints[sIdx, ]
-    local_optimizer = list(algorithm = "NLOPT_GN_MLSL_LDS", maxeval = 1e3, stopval = 10)
-    opts = list(algorithm = "NLOPT_LN_BOBYQA",maxeval = 1e3, stopval = 10,
+    local_optimizer = list(algorithm = "NLOPT_GN_MLSL_LDS", maxeval = 1e1, stopval = 10)
+    opts = list(algorithm = "NLOPT_LN_BOBYQA",maxeval = 1e1, stopval = 10,
                 local_optimizer = local_optimizer)
     # tau can't not be zero, otherwise the dominotor will be zero
     res = nloptr(x0 = x0, eval_f = negLLAction, lb = c(0, 1, 0) , ub = c(1, 30, 1),
@@ -21,7 +21,7 @@ singleFitting = function(combIdx, cond, wIni, trialEarnings, timeWaited, startPo
       break
     }
   }# end of all starting points
-  if( (combIdx %% 25) == 0){
+  if( (combIdx %% 2) == 0){
     txt = sprintf('complete %d percents', round(combIdx / nComb * 100))
     print(txt)      
   }
