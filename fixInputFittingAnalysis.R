@@ -2,7 +2,7 @@ library('ggplot2')
 source('subFxs/wtwSettings.R')
 source('subFxs/plotThemes.R')
 load('outputs/fixInputSimData/initialSpace.RData')
-load('outputs/fixInputSimData/actionRecoverSmallPhiNI.RData')
+load('outputs/fixInputSimData/paraFitting.RData')
 load('outputs/fixInputSimData/colpData.RData')
 dir.create('outputs/fixInputSim_figures')
 

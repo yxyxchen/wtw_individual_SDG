@@ -53,7 +53,7 @@ for(condIdx in 1 : 2){
   negLLs[[cond]] = thisNegLLs
   solutions[[cond]] = thisSolutions
 }# end of all conditions
-save(file = 'outputs/fixInputSimData/actionRecoverSmallPhiNI.RData', 'negLLs', 'solutions')
+save(file = 'outputs/fixInputSimData/paraFitting.RData', 'negLLs', 'solutions')
 
       
      
