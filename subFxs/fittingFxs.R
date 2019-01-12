@@ -73,7 +73,7 @@ negLLAction  = function(x, cond, wIni, trialEarnings, timeWaited){
       trialReward = tokenValue
       Qwait[1 : nTimePoint] = (1 - phi) * Qwait[1 : nTimePoint] + phi * trialReward * gamma ^ rev((0 : (nTimePoint - 1 )))
     }else{
-      nextWaitRateHat =  1 / sum(1  + exp((Qquit - Qwait[1])* tau))
+      nextWaitRateHat =  1 / (1 + exp((Qquit - Qwait[1])* tau))
       trialReward = nextWaitRateHat * Qwait[1] * gamma ^(iti / stepDuration) +
         (1 - nextWaitRateHat) * Qquit * gamma ^(iti / stepDuration)
       
