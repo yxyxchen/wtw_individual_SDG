@@ -58,4 +58,3 @@ b = adply(a, 2, function(x) x) # change arrays into dataframe
 c = select(b, -chains)
 d = gather(c, variable, estimate)
 left_join(d, known_parameters, by = "variable")
-
