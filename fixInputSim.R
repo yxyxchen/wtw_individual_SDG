@@ -34,14 +34,15 @@ save('nTrials', 'nRep', 'rewardDelays', file = 'outputs/fixInputSimData/fixInput
 ############# generate the parameter search space ##########
 # use different parameters for simulation and fixInput simulation
 # here we need to make sure the parameters are similiar to the true parameters
-nPara = 3
+nPara = 4
 paraNames = c('phi', 'tau', 'gamma', 'steep', 'ratio')
-nValue = 5
+nValue = 3
 nComb = nValue ^ nPara
 initialSpace = matrix(NA, nValue^nPara, nPara)
-initialSpace[,1] = rep(seq(0.01, 0.05, length.out = 5), nValue^(nPara - 1)) # phi
-initialSpace[,2] = rep(rep(seq(2, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
-initialSpace[,3] = rep(seq(0.8, 0.98, length.out = 5), each = nValue^2)
+initialSpace[,1] = rep(c(0.02, 0.04, 0.06), nValue^(nPara - 1)) # phi
+initialSpace[,2] = rep(rep(c(10, 16, 22), each = nValue), nValue^(nPara - 2)) # tau
+initialSpace[,3] = rep(rep(c(0.8, 0.89, 0.98), each = nValue^2), nValue ^ (nPara - 3))
+initialSpace[,4] = rep(rep(c(0.5, 0.8, 1.2), each = nValue^3), nValue ^ (nPara - 4))
 
 wInis = list()
 for(c in 1 : 2){

@@ -8,7 +8,7 @@ singleFitting = function(combIdx, cond, wIni, trialEarnings, timeWaited, startPo
     opts = list(algorithm = "NLOPT_LN_BOBYQA",maxeval = 1e1, stopval = 10,
                 local_optimizer = local_optimizer)
     # tau can't not be zero, otherwise the dominotor will be zero
-    res = nloptr(x0 = x0, eval_f = negLLAction, lb = c(0, 1, 0) , ub = c(1, 30, 1),
+    res = nloptr(x0 = x0, eval_f = negLLAction, lb = c(0, 1, 0, 0.0001) , ub = c(1, 30, 1, 5),
                  opts = opts, cond = cond, wIni = wIni,
                  trialEarnings = trialEarnings, timeWaited =  timeWaited)
     if(res$objective < negLL){
@@ -36,6 +36,7 @@ negLLAction  = function(x, cond, wIni, trialEarnings, timeWaited){
   phi = x[1]
   tau = x[2]
   gamma = x[3]
+  ratio = x[4]
   
   # parse otherPara
   tMax= ifelse(cond == 'HP', tMaxs[1], tMaxs[2])
@@ -44,7 +45,7 @@ negLLAction  = function(x, cond, wIni, trialEarnings, timeWaited){
   
   # initialize action values, eligibility traces and lik
   Qwait = rep(wIni, nTimeStep) 
-  Qquit = wIni * gamma ^(iti / stepDuration)
+  Qquit = wIni * ratio
   LL = 0
   
   # need to skip 

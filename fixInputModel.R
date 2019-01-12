@@ -4,6 +4,7 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
   phi = para[1]
   tau = para[2]
   gamma = para[3]
+  ratio = para[4]
   lambda = 1
   # wIni = optimRewardRates[[cond]] / (1 - gamma)
   
@@ -22,7 +23,7 @@ fixInputModel = function(para, otherPara, cond, wIni, rewardDelays){
   # initialize action value, eligibility trace and stat
   # exp(-r * stepDuration) = gamma
   Qwait = rep(wIni, nTimeStep) # Q(si, ai = wait), any i
-  Qquit = wIni * gamma ^(iti / stepDuration)
+  Qquit = wIni *ratio
   
   # recordings of vaWait and vaQuit
   vaWaits = matrix(NA, nTimeStep, nTrial);

@@ -11,16 +11,17 @@ source('subFxs/fittingFxs.R')
 load('outputs/fixInputSimData/initialSpace.RData') # need nComb(for loop), wIni, nPara(for initialize)
 ################ initial start points space ############
 # non-informative starting points 
-startPoints = matrix(NA, 3 ^ 3,3)
-startPoints[,1] = rep(c(0.1, 0.5, 0.9), each = 3 ^ 2)
-startPoints[,2] = rep(c(2, 15, 28), each = 3 , 3)
-startPoints[,3] = rep(c(0.1, 0.5, 0.90), 3^2)
+# startPoints = matrix(NA, 3 ^ 3,3)
+# startPoints[,1] = rep(c(0.1, 0.5, 0.9), each = 3 ^ 2)
+# startPoints[,2] = rep(c(2, 15, 28), each = 3 , 3)
+# startPoints[,3] = rep(c(0.1, 0.5, 0.90), 3^2)
 
 # informative starting points 
-startPoints = matrix(NA, 3 ^ 3,3)
-startPoints[,1] = rep(c(0.005, 0.035, 0.06), each = 3 ^ 2)
-startPoints[,2] = rep(c(2, 15, 28), each = 3 , 3)
-startPoints[,3] = rep(c(0.75, 0.87, 0.99), 3^2)
+startPoints = matrix(NA, 3 ^ 4,4)
+startPoints[,1] = rep(c(0.01, 0.05, 0.1), each = 3 ^ 3)
+startPoints[,2] = rep(c(5, 15, 28), each = 3 , 3^2)
+startPoints[,3] = rep(c(0.75, 0.90, 0.99), each = 3^2 , 3)
+startPoints[,4] = rep(c(0.3, 0.9, 1.5), 3^3)
 #################### for vaWaits and vaQuits ###############
 # loop across conditions
 negLLs = list()
@@ -49,11 +50,11 @@ for(condIdx in 1 : 2){
   
   junk = matrix(unlist(tempt), nrow = nComb, byrow = T)
   thisNegLLs = junk[,1]
-  thisSolutions = junk[,2:4]
+  thisSolutions = junk[,2:5]
   negLLs[[cond]] = thisNegLLs
   solutions[[cond]] = thisSolutions
 }# end of all conditions
-save(file = 'outputs/fixInputSimData/actionRecoverSmallPhiNI.RData', 'negLLs', 'solutions')
+save(file = 'outputs/fixInputSimData/paraFitting.RData', 'negLLs', 'solutions')
 
       
      
