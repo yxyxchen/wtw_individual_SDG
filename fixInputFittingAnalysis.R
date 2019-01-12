@@ -2,7 +2,7 @@ library('ggplot2')
 source('subFxs/wtwSettings.R')
 source('subFxs/plotThemes.R')
 load('outputs/fixInputSimData/initialSpace.RData')
-load('outputs/fixInputSimData/actionRecoverSmallPhiNI.RData')
+load('outputs/fixInputSimData/paraFitting.RData')
 load('outputs/fixInputSimData/colpData.RData')
 dir.create('outputs/fixInputSim_figures')
 
@@ -21,11 +21,12 @@ ggsave('outputs/fixInputSim_figures/negLL.pdf', width = 6, height = 4)
 plotData = data.frame(c(negLLs$HP, negLLs$LP), rbind(solutions$HP, solutions$LP),
                       rbind(initialSpace, initialSpace),
                       conditions = rep(c('HP', 'LP'), each = nComb))
-colnames(plotData) = c('LL', 'phiHat', 'tauHat', 'gammaHat',
-                       'phi', 'tau', 'gamma', 'cond')
+colnames(plotData) = c('LL', 'phiHat', 'tauHat', 'gammaHat','ratioHat',
+                       'phi', 'tau', 'gamma', 'ratio', 'cond')
 plotData$phi = factor(plotData$phi)
 plotData$tau = factor(plotData$tau)
 plotData$gamma = factor(plotData$gamma)
+plotData$ratio = factor(plotData$ratio)
 ggplot(plotData, aes(phi, phiHat)) + geom_boxplot() + facet_grid(.~cond) +
   geom_point() + saveTheme 
 ggsave('outputs/fixInputSim_figures/phi_phiHat.pdf', width = 8, height = 3)
@@ -38,8 +39,11 @@ ggplot(plotData, aes(gamma, gammaHat)) + geom_boxplot() + facet_grid(.~cond) +
   geom_point() + saveTheme 
 ggsave('outputs/fixInputSim_figures/gamma_gammaHat.pdf',width = 8, height = 3)
 
+ggplot(plotData, aes(ratio, ratioHat)) + geom_boxplot() + facet_grid(.~cond) +
+  geom_point() + saveTheme 
+ggsave('outputs/fixInputSim_figures/ratio_ratioHat.pdf',width = 8, height = 3)
 
-#################### parameter pair
+#################### parameter pair ##### not complete
 ggplot(plotData, aes(phiHat, tauHat)) + geom_point() + saveTheme + facet_grid(~cond) +
   ylim(c(-0.1, 31)) + xlim(c(-0.1, 1.1))
 ggsave('outputs/fixInputSim_figures/phiHat_tauHat.pdf',width = 8, height = 4) 
