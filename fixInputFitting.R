@@ -44,9 +44,12 @@ for(condIdx in 1 : 2){
   thisNegLLs = vector(length = nComb)
   thisSolutions = matrix(NA, nComb, nPara)
   
-  tempt = mclapply(1 : nComb, function(combIdx)
-    singleFitting(combIdx, cond, wIni, trialEarningsList[combIdx,], timeWaitedList[combIdx,], startPoints),
-    mc.cores = 2)
+  system.time({
+    tempt = mclapply(1 : nComb, function(combIdx)
+      singleFitting(combIdx, cond, wIni, trialEarningsList[combIdx,], timeWaitedList[combIdx,], startPoints),
+      mc.cores = 3)
+  })
+
   
   junk = matrix(unlist(tempt), nrow = nComb, byrow = T)
   thisNegLLs = junk[,1]
