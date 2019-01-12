@@ -21,7 +21,7 @@ singleFitting = function(combIdx, cond, wIni, trialEarnings, timeWaited, startPo
       break
     }
   }# end of all starting points
-  if( (combIdx %% 2) == 0){
+  if( (combIdx %% 25) == 0){
     txt = sprintf('complete %d percents', round(combIdx / nComb * 100))
     print(txt)      
   }
