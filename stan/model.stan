@@ -34,8 +34,7 @@ transformed parameters{
   
   // initialize trialReward and nextWaitRateHat
   real trialReward;
-  real nextWaitRateHat;
-  
+  real nextWaitRateHat = 1.0;
   // 
   vector[nTimeStep] gammaList;
   for(i in 1 : nTimeStep){
