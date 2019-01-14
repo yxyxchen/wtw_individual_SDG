@@ -8,11 +8,7 @@ library('tidyr')
 source('stan/singleFittingStan.R')
 
 model = stan_model(file = "stan/model.stan")
-for(i in 7: 125){
-  singleFittingStan(2, i)
-}
-
 model = stan_model(file = "stan/model.stan")
-for(i in 1: 125){
-  singleFittingStan(2, i)
+for(i in 1: 81){
+  singleFittingStan(1, i)
 }
