@@ -20,8 +20,8 @@ paraNames = c('phi', 'tau', 'gamma')
 nValue = 5
 nComb = nValue ^ nPara
 initialSpace = matrix(NA, nValue^nPara, nPara)
-initialSpace[,1] = rep(seq(0.1, 0.5, by = 0.1), nValue^(nPara - 1)) # phi
-initialSpace[,2] = rep(rep(seq(2, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
+initialSpace[,1] = rep(seq(0.01, 0.05, length.out = 5), nValue^(nPara - 1)) # phi
+initialSpace[,2] = rep(rep(seq(10, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
 initialSpace[,3] = rep(seq(0.8, 0.98, length.out = 5), each = nValue^2)
 
 
@@ -73,9 +73,8 @@ for(condIdx in 1 : 2){
   tMax = otherPara[['tMax']]
   TrialEarnings = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
   RewardDelays = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
-  Qwait = array(dim = c(nValue^nPara, nRep, tMax / stepDuration)) # diifferent from master
   TimeWaited = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
-  vaQuits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, blockSecs / iti + 1))
+  vaQuits = array(dim = c(nValue^nPara, nRep, blockSecs / iti + 1))
   vaWaits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, blockSecs / iti + 1))
   
   for(h in 1 : nrow(initialSpace)){
@@ -84,17 +83,16 @@ for(condIdx in 1 : 2){
     for(j in 1 : nRep ){
       tempt=  simulationModel(para,otherPara, cond, wIni)
       TrialEarnings[h, j,] = tempt[['trialEarnings']]
-      Qwait[h, j,] = tempt[['Qwait']]
       RewardDelays[h, j,] = tempt[['rewardDelays']]
       TimeWaited[h, j, ] = tempt[['timeWaited']]
-      vaQuits[h, j,  , ] = tempt[['vaQuits']]
+      vaQuits[h, j, ] = tempt[['vaQuits']]
       vaWaits[h, j, ,  ] = tempt[['vaWaits']]
       thisPackData[[count[h, j]]] = tempt
     }  
   }
   
   # organize and save outputs 
-  outputData = list("Qwait" = Qwait, "timeWaited" = TimeWaited,
+  outputData = list("timeWaited" = TimeWaited,
                     "rewardDelays" = RewardDelays, "trialEarnings" = TrialEarnings,
                     "vaWaits" = vaWaits, "vaQuits" = vaQuits
   )
@@ -117,4 +115,5 @@ for(condIdx in 1 : 2){
     save(packLPData,file = fileName)
   }
 }
+
 
