@@ -8,6 +8,9 @@ library('dplyr')
 library('tidyr')
 source('fixInputModel.R')
 
+# load data
+load('outputs/simData/initialSpace.RData')
+
 # output files
 dir.create('outputs/fixInputSimData')
 dir.create('outputs/fixInputSim_figures')
@@ -30,40 +33,6 @@ for(cIdx in 1 : 2){
 }
 save('nTrials', 'nRep', 'rewardDelays', file = 'outputs/fixInputSimData/fixInputs.RData')
 
-
-############# generate the parameter search space ##########
-# use different parameters for simulation and fixInput simulation
-# here we need to make sure the parameters are similiar to the true parameters
-nPara = 3
-paraNames = c('phi', 'tau', 'gamma')
-nValue = 5
-nComb = nValue ^ nPara
-initialSpace = matrix(NA, nValue^nPara, nPara)
-initialSpace[,1] = rep(seq(0.01, 0.05, length.out = 5), nValue^(nPara - 1)) # phi
-initialSpace[,2] = rep(rep(seq(2, 22, length.out = 5), each = nValue), nValue^(nPara - 2)) # tau
-initialSpace[,3] = rep(seq(0.8, 0.98, length.out = 5), each = nValue^2)
-
-wInis = list()
-for(c in 1 : 2){
-  cond = conditions[c];
-  trialTick = trialTicks[[cond]]
-  thisDelayPDF = rewardDelayPDF[[cond]]
-  nTicks = length(trialTick)
-  
-  # assume gamma = 0.9
-  gamma = 0.9
-  r = - log(gamma) / stepDuration
-  actionValueWaits = rep(0, nTicks)
-  for(k in 1 : nTicks){
-    actionValueWaits[k] = sum(tokenValue * exp(- (trialTick[k : nTicks] - trialTick[k]) * r)* thisDelayPDF[k : nTicks] / sum( thisDelayPDF[k : nTicks]))    
-  }
-  junk = mean(actionValueWaits)    
-  wInis[[cond]] = junk
-}
-
-save('initialSpace', 'nValue', 'nPara', 'paraNames', 'nComb', 'wInis',
-     file = 'outputs/fixInputSimData/initialSpace.RData')
-
 ################## simulation ##########
 set.seed(123)
 for(cIdx in 1 : 2){
@@ -80,7 +49,7 @@ for(cIdx in 1 : 2){
   # initialize outputs
   TrialEarnings = array(dim = c(nValue^nPara, nRep, nTrials))
   TimeWaited = array(dim = c(nValue^nPara, nRep, nTrials))
-  vaQuits = array(dim = c(nValue^nPara, nRep, nTrials))
+  vaQuits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, nTrials))
   vaWaits = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, nTrials))
   dvs = array(dim = c(nValue^nPara, nRep, tMax / stepDuration, nTrials)) # decision value, Qwait - Qquit, scaled within trials
   # simulate for every para
@@ -92,10 +61,12 @@ for(cIdx in 1 : 2){
       TrialEarnings[i, j, ] = junk[1 : nTrials]
       junk =  tempt[['timeWaited']]
       TimeWaited[i, j, ] = junk[1 : nTrials]
-      vaQuits[i, j,  ] = tempt[['vaQuits']]
-      vaWaits[i, j, ,  ]  = tempt[['vaWaits']]
+      junk = tempt[['vaQuits']]
+      vaQuits[i, j,  , ] = transVaQuits(junk[, 1 : nTrials])
+      junk = tempt[['vaWaits']]
+      vaWaits[i, j, ,  ]  = transVaWaits(junk[, 1 : nTrials])
       # decision value
-      junk = vaWaits[i, j, ,  ] - vaQuits[i, j, ]
+      junk = vaWaits[i, j, ,  ] - vaQuits[i, j, ,  ]
       dvs[i, j, , ] = junk
     }
   }

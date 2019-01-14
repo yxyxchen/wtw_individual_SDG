@@ -137,37 +137,12 @@ fileName = file.path(outFile, "HPAUC_LPAUC.pdf")
 ggsave(fileName, width = 8, height = 8)
 
 
-# the minimun in 
-#################
-for(i in 1 : 125){
-  endTick = match(0, rawLPData$rewardDelays[i, 1, ]) - 1
-  delay = rawLPData$rewardDelays[i, 1, 1 : endTick]
-  delayCount = tapply(delay, cut(delay, seq(0, 20, by = 0.5)), length)
-  delayCount[is.na(delayCount)] = 0
+########### look at raw data ##############
+linearData = as.data.frame(initialSpace);
+colnames(linearData) = c('phi', 'tau', 'gamma', 'lambda', 'wIni')
+linearData$AUC = colpHPData$AUC
+summarise(group_by(linearData, phi), mu = mean(wIni))
+fit = lm(AUC ~ phi + tau + wIni + gamma + lambda, data = linearData)
+summary(fit)
 
-  plotData = data.frame(delay = delayCount, Qwait = rawHPData$vaWaits[i, 1, , 25], time = 
-                          1 : 40)
-  
-  txt = sprintf('%.2f, %d, %2f', initialSpace[i,1], initialSpace[i,2], initialSpace[i,3])
-  p = ggplot(plotData,aes(time, Qwait)) + geom_point(color = 'red') +
-    geom_line(aes(time, delay), color = 'blue') + ggtitle(txt)
-  print(p)
-  readline(prompt = paste(i, '(ENTER to continue)'))
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+plot()
