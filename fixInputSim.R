@@ -35,7 +35,7 @@ save('nTrials', 'nRep', 'rewardDelays', file = 'outputs/fixInputSimData/fixInput
 # use different parameters for simulation and fixInput simulation
 # here we need to make sure the parameters are similiar to the true parameters
 nPara = 3
-paraNames = c('phi', 'tau', 'gamma', 'steep', 'ratio')
+paraNames = c('phi', 'tau', 'gamma')
 nValue = 5
 nComb = nValue ^ nPara
 initialSpace = matrix(NA, nValue^nPara, nPara)

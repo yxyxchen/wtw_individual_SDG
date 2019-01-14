@@ -40,7 +40,8 @@ singleFittingStan = function(condIdx, combIdx){
   # init = list(list('phi' = 0.5, 'tau' = 15, 'gamma' = 0.5),
   #             list('phi' = 0.1, 'tau' = 5, 'gamma' = 0.1))
   tempt = sampling(object = model, data = data_list, cores = nCore, chains = nChain,
-               iter = 5000) %>%
+               iter = 5000, 
+               show_messages = F) %>%
     rstan::extract(permuted = F, pars = c("phi", "tau", "gamma")) %>%
     adply(2, function(x) x) %>%  # change arrays into 2-d dataframe 
     select(-chains) %>% cbind(data.frame(combIdx = rep(combIdx, nCore * nChain), condition = rep(cond, nCore * nChain)))
