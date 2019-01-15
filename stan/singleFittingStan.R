@@ -1,5 +1,5 @@
 # set up 
-singleFittingStan = function(combIdx, cond, wIni, timeWaited, trialEarning, dirName){
+singleFittingStan = function(combIdx, cond, wIni, timeWaited, trialEarning, fileName, pars){
   tMax = ifelse(cond == "HP", tMaxs[1], tMaxs[2])
   nChain = 2
   nIter = 5000
@@ -17,10 +17,10 @@ singleFittingStan = function(combIdx, cond, wIni, timeWaited, trialEarning, dirN
   tempt = sampling(object = model, data = data_list, cores = nChain, chains = nChain,
                iter = nIter, 
                show_messages = F) %>%
-    rstan::extract(permuted = F, pars = c("phi", "tau", "gamma")) %>%
+    rstan::extract(permuted = F, pars = pars) %>%
     adply(2, function(x) x) %>%  # change arrays into 2-d dataframe 
     select(-chains) %>% cbind(data.frame(combIdx = rep(combIdx, nIter * nChain), condition = rep(cond, nIter * nChain)))
-  write.csv(tempt, file = fileName,row.names=FALSE)
+    write.csv(tempt, file = fileName,row.names=FALSE)
 
 }
 

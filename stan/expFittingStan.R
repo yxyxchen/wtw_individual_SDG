@@ -7,7 +7,8 @@ rstan_options(auto_write = TRUE) # default settings borrowed somewhere
 options(mc.cores = parallel::detectCores())# enable multi-core precessors 
 library('tidyr')
 source('stan/singleFittingStan.R')
-model = stan_model(file = "stan/model.stan")
+model = stan_model(file = "stan/monteRatio.stan")
+pars = c("phi", "tau", "gamma", "ratio")
 
 # fitting the model
 source('subFxs/wtwSettings.R') 
@@ -56,5 +57,5 @@ for(sIdx in 9 : n){
   trialEarnings= trialEarningsList[[sIdx]]
   timeWaited = timeWaitedList[[sIdx]]
   fileName = sprintf("stanOutPuts/expData/%d.txt", sIdx)
-  singleFittingStan(sIdx, cond, wIni, timeWaited, trialEarnings, fileName)
+  singleFittingStan(sIdx, cond, wIni, timeWaited, trialEarnings, fileName, pars)
 }
