@@ -51,11 +51,11 @@ timeWaitedList = sapply(1:n, function(sIdx){
   ifelse(trialEarningsList[[sIdx]] > 0, scheduledWaitList[[sIdx]], timeWaitedList[[sIdx]])
 })
 
-for(sIdx in 9 : n){
+for(sIdx in 1 : n){
   wIni = wIniList[[sIdx]]
   cond = condList[[sIdx]]
   trialEarnings= trialEarningsList[[sIdx]]
   timeWaited = timeWaitedList[[sIdx]]
-  fileName = sprintf("stanOutPuts/expData/%d.txt", sIdx)
+  fileName = sprintf("stanOutPuts/monteRatio/%d.txt", sIdx)
   singleFittingStan(sIdx, cond, wIni, timeWaited, trialEarnings, fileName, pars)
 }
