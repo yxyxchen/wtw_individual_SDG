@@ -1,7 +1,7 @@
 # set up 
 singleFittingStan = function(condIdx, combIdx){
   nChain = 2
-  nCore = 5000
+  nIter = 5000
   
   # fitting the model
   source('subFxs/wtwSettings.R') 
@@ -39,12 +39,12 @@ singleFittingStan = function(condIdx, combIdx){
                     nTimePoints = nTimePoints)
   # init = list(list('phi' = 0.5, 'tau' = 15, 'gamma' = 0.5),
   #             list('phi' = 0.1, 'tau' = 5, 'gamma' = 0.1))
-  tempt = sampling(object = model, data = data_list, cores = nCore, chains = nChain,
-               iter = 5000, 
+  tempt = sampling(object = model, data = data_list, cores = nChain, chains = nChain,
+               iter = nIter, 
                show_messages = F) %>%
     rstan::extract(permuted = F, pars = c("phi", "tau", "gamma")) %>%
     adply(2, function(x) x) %>%  # change arrays into 2-d dataframe 
-    select(-chains) %>% cbind(data.frame(combIdx = rep(combIdx, nCore * nChain), condition = rep(cond, nCore * nChain)))
+    select(-chains) %>% cbind(data.frame(combIdx = rep(combIdx, nIter * nChain), condition = rep(cond, nIter * nChain)))
   fileName = sprintf('stanOutPuts/fixInputSimData/%s_%d.txt', cond, combIdx)
   write.csv(tempt, file = fileName,row.names=FALSE)
 
